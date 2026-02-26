@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -13,6 +14,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
+import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 import {
   Sidebar,
@@ -37,13 +40,25 @@ const navigation = [
 export function AppSidebar() {
   const pathname = usePathname()
   const { state } = useSidebar()
+  const logoImage = PlaceHolderImages.find(img => img.id === "app-logo")
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b px-4 py-4">
         <div className="flex items-center gap-2 overflow-hidden">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sprout className="h-5 w-5" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary/10">
+            {logoImage ? (
+              <Image 
+                src={logoImage.imageUrl} 
+                alt={logoImage.description} 
+                width={32} 
+                height={32} 
+                className="object-cover"
+                data-ai-hint={logoImage.imageHint}
+              />
+            ) : (
+              <Sprout className="h-5 w-5 text-primary" />
+            )}
           </div>
           {state === "expanded" && (
             <span className="font-headline font-bold text-lg text-primary truncate">
