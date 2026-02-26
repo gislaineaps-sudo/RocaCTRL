@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -10,7 +9,8 @@ import {
   BrainCircuit,
   Settings,
   HelpCircle,
-  Library
+  Library,
+  Cpu
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -34,6 +34,7 @@ const navigation = [
   { name: "Culturas", href: "/crops", icon: Sprout },
   { name: "Categorias", href: "/categories", icon: Library },
   { name: "Alertas", href: "/alerts", icon: Bell },
+  { name: "Monitoramento IoT", href: "/iot", icon: Cpu },
   { name: "Assistente IA", href: "/ai-assistant", icon: BrainCircuit },
 ]
 
