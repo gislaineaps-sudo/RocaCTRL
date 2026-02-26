@@ -16,7 +16,9 @@ import {
   Wind,
   CloudRain,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Leaf,
+  Cherry
 } from "lucide-react"
 import { 
   BarChart, 
@@ -34,19 +36,19 @@ import { ChartContainer } from "@/components/ui/chart"
 import { getWeatherAnalysis, type WeatherAnalysisOutput } from "@/ai/flows/weather-analysis"
 
 const animalData = [
-  { name: "Bovinos", value: 45 },
-  { name: "Ovinos", value: 30 },
-  { name: "Suínos", value: 15 },
-  { name: "Aves", value: 10 },
+  { name: "Galinhas", value: 60 },
+  { name: "Abelhas", value: 20 },
+  { name: "Cabras", value: 15 },
+  { name: "Outros", value: 5 },
 ]
 
 const cropData = [
-  { month: "Jan", milho: 400, soja: 240 },
-  { month: "Fev", milho: 300, soja: 139 },
-  { month: "Mar", milho: 200, soja: 980 },
-  { month: "Abr", milho: 278, soja: 390 },
-  { month: "Mai", milho: 189, soja: 480 },
-  { month: "Jun", milho: 239, soja: 380 },
+  { month: "Jan", horta: 120, pomar: 45 },
+  { month: "Fev", horta: 150, pomar: 60 },
+  { month: "Mar", horta: 110, pomar: 180 },
+  { month: "Abr", horta: 90, pomar: 140 },
+  { month: "Mai", horta: 130, pomar: 95 },
+  { month: "Jun", horta: 140, pomar: 50 },
 ]
 
 const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "#4ADE80", "#FACC15"]
@@ -60,9 +62,9 @@ export default function Dashboard() {
       setLoadingWeather(true)
       try {
         const analysis = await getWeatherAnalysis({
-          location: "Região Central",
-          currentWeather: "Ensolarado, 29°C, Umidade 45%",
-          forecast: "Próximos 3 dias com sol intenso, sem previsão de chuva significativa."
+          location: "Sítio Primavera",
+          currentWeather: "Ensolarado, 27°C, Umidade 50%",
+          forecast: "Próximos dias secos, ideal para colheita de ervas."
         })
         setAiWeather(analysis)
       } catch (error) {
@@ -78,34 +80,33 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Dashboard Rural</h1>
-          <p className="text-muted-foreground">Visão geral da sua propriedade hoje.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Meu Sítio: Dashboard</h1>
+          <p className="text-muted-foreground">Gestão inteligente para sua agricultura familiar.</p>
         </div>
         
-        {/* Widget de Clima Rápido */}
         <div className="flex items-center gap-4 bg-white p-3 rounded-xl border shadow-sm">
           <div className="flex items-center gap-2 pr-4 border-r">
             <CloudSun className="h-8 w-8 text-orange-500" />
             <div>
-              <p className="text-2xl font-bold leading-none">29°C</p>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold">Ensolarado</p>
+              <p className="text-2xl font-bold leading-none">27°C</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold">Agradável</p>
             </div>
           </div>
           <div className="flex gap-4">
             <div className="text-center">
               <p className="text-[10px] font-bold text-muted-foreground uppercase">Ter</p>
               <CloudSun className="h-4 w-4 mx-auto text-orange-400" />
-              <p className="text-xs font-bold">31°</p>
+              <p className="text-xs font-bold">29°</p>
             </div>
             <div className="text-center">
               <p className="text-[10px] font-bold text-muted-foreground uppercase">Qua</p>
               <CloudRain className="h-4 w-4 mx-auto text-blue-400" />
-              <p className="text-xs font-bold">24°</p>
+              <p className="text-xs font-bold">22°</p>
             </div>
             <div className="text-center">
               <p className="text-[10px] font-bold text-muted-foreground uppercase">Qui</p>
               <ThermometerSun className="h-4 w-4 mx-auto text-red-400" />
-              <p className="text-xs font-bold">33°</p>
+              <p className="text-xs font-bold">30°</p>
             </div>
           </div>
         </div>
@@ -114,42 +115,42 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
+            <CardTitle className="text-sm font-medium">Criações</CardTitle>
             <PawPrint className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">124</div>
-            <p className="text-xs text-muted-foreground">+4 desde o mês passado</p>
+            <div className="text-2xl font-bold">42</div>
+            <p className="text-xs text-muted-foreground">Animais e Colmeias</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Área Plantada</CardTitle>
+            <CardTitle className="text-sm font-medium">Horta e Ervas</CardTitle>
             <Sprout className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">54.2 ha</div>
-            <p className="text-xs text-muted-foreground">+12% de expansão</p>
+            <div className="text-2xl font-bold">35 m²</div>
+            <p className="text-xs text-muted-foreground">Em plena produção</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tarefas Pendentes</CardTitle>
+            <CardTitle className="text-sm font-medium">Manutenção</CardTitle>
             <Clock className="h-4 w-4 text-accent-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">3 urgentes para hoje</p>
+            <div className="text-2xl font-bold">5</div>
+            <p className="text-xs text-muted-foreground">Tarefas para hoje</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Produtividade</CardTitle>
+            <CardTitle className="text-sm font-medium">Colheita Mensal</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+18%</div>
-            <p className="text-xs text-muted-foreground">Comparado ao ano anterior</p>
+            <div className="text-2xl font-bold">85 kg</div>
+            <p className="text-xs text-muted-foreground">+10% que jan/24</p>
           </CardContent>
         </Card>
       </div>
@@ -157,8 +158,8 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle className="font-headline">Progresso de Safras</CardTitle>
-            <CardDescription>Produção estimada por mês (Milho vs Soja)</CardDescription>
+            <CardTitle className="font-headline">Produção Diversificada</CardTitle>
+            <CardDescription>Volume colhido estimado (Horta vs Pomar)</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px]">
@@ -166,13 +167,13 @@ export default function Dashboard() {
                 <BarChart data={cropData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}t`} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}kg`} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "var(--radius)", border: "1px solid hsl(var(--border))" }}
                     cursor={{ fill: "hsl(var(--muted)/0.2)" }}
                   />
-                  <Bar dataKey="milho" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="soja" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="horta" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pomar" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -181,8 +182,8 @@ export default function Dashboard() {
         
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle className="font-headline">Distribuição de Rebanho</CardTitle>
-            <CardDescription>Composição atual por espécie</CardDescription>
+            <CardTitle className="font-headline">Distribuição Animal</CardTitle>
+            <CardDescription>Composição do pequeno rebanho</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
@@ -219,15 +220,14 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        {/* Alertas Climáticos Inteligentes */}
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div className="space-y-0.5">
               <CardTitle className="font-headline text-lg flex items-center gap-2">
                 <BrainCircuit className="h-5 w-5 text-primary" />
-                Análise Agroclimática IA
+                Dica da IA para o Sítio
               </CardTitle>
-              <CardDescription>Insights baseados na previsão local</CardDescription>
+              <CardDescription>Insights baseados no clima local</CardDescription>
             </div>
             {aiWeather && (
               <div className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
@@ -252,7 +252,7 @@ export default function Dashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Ações Prioritárias</p>
+                    <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Sugestões de Manejo</p>
                     <ul className="space-y-1">
                       {aiWeather.priorityTasks.map((task, i) => (
                         <li key={i} className="text-xs flex items-center gap-2 font-medium">
@@ -262,18 +262,12 @@ export default function Dashboard() {
                       ))}
                     </ul>
                   </div>
-                  <div className="flex flex-col justify-end">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-orange-600 bg-orange-50 p-2 rounded border border-orange-100">
-                      <Wind className="h-3 w-3" />
-                      Ventos constantes: 12km/h
-                    </div>
-                  </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-6 text-muted-foreground flex flex-col items-center gap-2">
                 <AlertTriangle className="h-5 w-5 opacity-40" />
-                <p className="text-xs">Não foi possível gerar a análise climática agora.</p>
+                <p className="text-xs">Falha ao carregar análise inteligente.</p>
               </div>
             )}
           </CardContent>
@@ -281,14 +275,14 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline text-lg">Próximos Alertas de Rotina</CardTitle>
+            <CardTitle className="font-headline text-lg">Próximos Cuidados</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[
-                { title: "Reparo de Cerca Divisa", date: "Hoje", type: "Infraestrutura", icon: Hammer, color: "text-red-500" },
-                { title: "Adubação Cobertura Milho", date: "Em 5 dias", type: "Adubação", icon: Droplets, color: "text-primary" },
-                { title: "Poda de Limpeza Pomar", date: "Em 1 semana", type: "Podas", icon: Scissors, color: "text-green-500" },
+                { title: "Poda Jabuticabeiras", date: "Amanhã", type: "Pomar", icon: Scissors, color: "text-green-600" },
+                { title: "Rega Reforçada Ervas", date: "Hoje", type: "Horta", icon: Droplets, color: "text-blue-500" },
+                { title: "Limpeza Gallinheiro", date: "Em 3 dias", type: "Animais", icon: Hammer, color: "text-orange-500" },
               ].map((alert, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-lg border bg-card/50 hover:bg-muted/50 transition-colors">
                   <alert.icon className={`h-5 w-5 ${alert.color}`} />

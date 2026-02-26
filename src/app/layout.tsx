@@ -5,8 +5,8 @@ import {AppSidebar} from '@/components/layout/app-sidebar';
 import {Toaster} from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'RoçaCtrl - Gestão Rural Inteligente',
-  description: 'Sistema completo para gestão de animais, plantio e manutenção rural.',
+  title: 'RoçaCtrl - Gestão de Sítios e Agricultura Familiar',
+  description: 'Sistema inteligente para gestão de hortas, pomares e pequenos rebanhos.',
 };
 
 export default function RootLayout({

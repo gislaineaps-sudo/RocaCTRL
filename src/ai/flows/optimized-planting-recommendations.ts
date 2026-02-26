@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview An AI assistant that provides optimized planting recommendations based on soil type and local weather data.
+ * @fileOverview An AI assistant that provides optimized planting recommendations based on soil type and local weather data, focused on family farming and small holdings.
  *
  * - optimizedPlantingRecommendations - A function that handles the planting recommendations process.
  * - OptimizedPlantingRecommendationsInput - The input type for the optimizedPlantingRecommendations function.
@@ -14,12 +14,12 @@ const OptimizedPlantingRecommendationsInputSchema = z.object({
   soilType: z
     .string()
     .describe(
-      'The type of soil, e.g., "argiloso", "arenoso", "humoso", "calcário", etc.'
+      'O tipo de solo, ex: "argiloso", "arenoso", "compostado", etc.'
     ),
   weatherData: z
     .string()
     .describe(
-      'Detailed local weather data, e.g., "temperatura média 25°C, precipitação 150mm/mês, umidade 70%, sem previsão de geada nos próximos 3 meses".'
+      'Dados meteorológicos locais ou descrição do clima da chácara/sítio.'
     ),
 });
 export type OptimizedPlantingRecommendationsInput = z.infer<
@@ -30,17 +30,17 @@ const OptimizedPlantingRecommendationsOutputSchema = z.object({
   cropSuggestions: z
     .array(z.string())
     .describe(
-      'A list of suggested crops optimized for the given soil and weather conditions.'
+      'Lista de cultivos sugeridos (hortaliças, frutíferas, ervas) para pequena escala.'
     ),
   plantingSchedule: z
     .string()
     .describe(
-      'An optimized planting schedule for the suggested crops, including best times for planting and harvesting.'
+      'Cronograma de plantio otimizado para o pequeno produtor.'
     ),
   justification: z
     .string()
     .describe(
-      'A detailed explanation of why these crops and schedules were recommended, based on agricultural best practices.'
+      'Justificativa focada em agricultura familiar e aproveitamento de espaço.'
     ),
 });
 export type OptimizedPlantingRecommendationsOutput = z.infer<
@@ -57,12 +57,14 @@ const prompt = ai.definePrompt({
   name: 'optimizedPlantingRecommendationsPrompt',
   input: {schema: OptimizedPlantingRecommendationsInputSchema},
   output: {schema: OptimizedPlantingRecommendationsOutputSchema},
-  prompt: `Você é um assistente agrícola especialista em otimização de cultivo e manejo de rebanho. Seu objetivo é fornecer sugestões inteligentes para cronogramas de plantio e seleção de culturas para maximizar a produtividade.
+  prompt: `Você é um assistente agrícola especialista em agricultura familiar, hortas urbanas e pequenos sítios/chácaras. Seu objetivo é ajudar o pequeno produtor a diversificar sua produção e aproveitar cada metro quadrado de terra.
 
-Com base nas seguintes informações de solo e clima, sugira os melhores cultivos e um cronograma de plantio otimizado. Inclua uma justificativa detalhada para as suas recomendações, explicando como elas se alinham às melhores práticas agrícolas e às condições fornecidas.
+Com base nas seguintes informações de solo e clima, sugira os melhores cultivos (priorizando hortaliças, árvores frutíferas de pequeno/médio porte, ervas medicinais e temperos) e um cronograma de manejo simplificado. 
+
+Inclua uma justificativa detalhada explicando como essas escolhas ajudam na sustentabilidade da propriedade e na segurança alimentar da família ou pequena comercialização.
 
 Tipo de Solo: {{{soilType}}}
-Dados Meteorológicos Locais: {{{weatherData}}}`,
+Dados Meteorológicos: {{{weatherData}}}`,
 });
 
 const optimizedPlantingRecommendationsFlow = ai.defineFlow(

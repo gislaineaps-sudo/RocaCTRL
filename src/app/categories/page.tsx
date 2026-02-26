@@ -12,15 +12,15 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Search, Info, Bird, Fish, HelpCircle, Beef, FlaskConical } from "lucide-react"
+import { Search, Info, Bird, Fish, HelpCircle, Beef, FlaskConical, Leaf, Cherry, Sprout } from "lucide-react"
 
 const categories = [
-  { id: 1, name: "Avicultura", species: "Galinha Caipira, Codorna, Pato, Ganso, Peru", products: "Ovos, Carne, Penas, Esterco (Adubo)", icon: Bird },
-  { id: 2, name: "Cunicultura", species: "Coelho (Nova Zelândia, Gigante de Flandres)", products: "Carne, Pele, Matrizes", icon: HelpCircle },
-  { id: 3, name: "Apicultura", species: "Abelha Europa (Apis), Jataí, Mandaçaia", products: "Mel, Própolis, Pólen, Cera, Geleia Real", icon: FlaskConical },
-  { id: 4, name: "Pequenos Ruminantes", species: "Cabra (Saanen, Alpina), Ovelha (Santa Inês)", products: "Leite, Queijo, Iogurte, Lã, Carne", icon: Beef },
-  { id: 5, name: "Piscicultura", species: "Tilápia, Tambaqui, Carpa", products: "Filé, Peixe Inteiro, Alevinos", icon: Fish },
-  { id: 6, name: "Ranicultura", species: "Rã-touro", products: "Carne, Couro", icon: Info },
+  { id: 1, name: "Horta de Vegetais", species: "Alface, Tomate Cereja, Cenoura, Pimentão, Couve", products: "Consumo Próprio, Venda Local, Feiras", icon: Sprout },
+  { id: 2, name: "Pomar (Frutíferas)", species: "Limão, Jabuticaba, Amora, Banana, Mamão", products: "Frutas Frescas, Geleias, Sucos", icon: Cherry },
+  { id: 3, name: "Ervas e Temperos", species: "Manjericão, Alecrim, Hortelã, Salsinha, Cebolinha", products: "Temperos Frescos, Chás, Óleos Essenciais", icon: Leaf },
+  { id: 4, name: "Avicultura Familiar", species: "Galinha Caipira (Postura e Corte), Codorna", products: "Ovos Caipiras, Carne, Esterco para Horta", icon: Bird },
+  { id: 5, name: "Apicultura / Meliponicultura", species: "Abelha Jataí, Mandaçaia, Europa", products: "Mel, Polinização da Horta, Própolis", icon: FlaskConical },
+  { id: 6, name: "Pequenos Ruminantes", species: "Cabra Saanen (Leite), Ovelha Santa Inês", products: "Leite Artesanal, Queijos, Lã", icon: Beef },
 ]
 
 export default function CategoriesPage() {
@@ -36,8 +36,8 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Categorias de Produção</h1>
-          <p className="text-muted-foreground">Guia de referência para diversificação da propriedade rural.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Guia de Diversificação</h1>
+          <p className="text-muted-foreground">Foco em Agricultura Familiar e Produção de Pequena Escala.</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ export default function CategoriesPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Filtrar categorias, espécies ou produtos..." 
+                placeholder="Filtrar cultivos, espécies ou produtos..." 
                 className="pl-10" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -61,8 +61,8 @@ export default function CategoriesPage() {
               <TableHeader className="bg-muted/50">
                 <TableRow>
                   <TableHead className="w-[200px] font-bold">Categoria</TableHead>
-                  <TableHead className="font-bold">Espécies Comuns</TableHead>
-                  <TableHead className="font-bold">Principais Produtos</TableHead>
+                  <TableHead className="font-bold">Cultivos / Espécies</TableHead>
+                  <TableHead className="font-bold">Finalidade / Produtos</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -109,27 +109,25 @@ export default function CategoriesPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Info className="h-5 w-5 text-primary" />
-              Dica de Gestão
+              Sustentabilidade no Sítio
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              A diversificação de categorias pode aumentar a resiliência financeira da sua propriedade. 
-              Considere integrar produções complementares, como Apicultura próxima a Culturas que necessitam de polinização.
+              Em chácaras, a integração é a chave. Use o esterco das galinhas para adubar a horta e os restos de vegetais para alimentar os animais ou compostagem.
             </p>
           </CardContent>
         </Card>
         <Card className="bg-accent/5 border-accent/20">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Bird className="h-5 w-5 text-primary" />
-              Sustentabilidade
+              <Leaf className="h-5 w-5 text-primary" />
+              Agregação de Valor
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              O uso de subprodutos (como o esterco da avicultura) como adubo para suas culturas reduz custos 
-              e promove uma economia circular dentro da sua fazenda.
+              Transformar o excedente do pomar em geleias ou vender ervas frescas em maços aumenta a rentabilidade da pequena propriedade.
             </p>
           </CardContent>
         </Card>
