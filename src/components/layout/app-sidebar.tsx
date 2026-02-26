@@ -9,7 +9,6 @@ import {
   BrainCircuit,
   Settings,
   HelpCircle,
-  Menu,
   Library
 } from "lucide-react"
 import Link from "next/link"
@@ -23,7 +22,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -49,7 +47,7 @@ export function AppSidebar() {
           </div>
           {state === "expanded" && (
             <span className="font-headline font-bold text-lg text-primary truncate">
-              AgriConnect
+              RoçaCtrl
             </span>
           )}
         </div>

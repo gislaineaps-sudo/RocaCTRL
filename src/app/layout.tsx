@@ -5,7 +5,7 @@ import {AppSidebar} from '@/components/layout/app-sidebar';
 import {Toaster} from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'AgriConnect - Gestão Rural Inteligente',
+  title: 'RoçaCtrl - Gestão Rural Inteligente',
   description: 'Sistema completo para gestão de animais, plantio e manutenção rural.',
 };
 

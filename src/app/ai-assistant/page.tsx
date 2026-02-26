@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BrainCircuit, Sprout, PawPrint, Loader2, Sparkles, CheckCircle2 } from "lucide-react"
-import { livestockManagementAdviceFlow } from "@/ai/flows/livestock-management-advice"
+import { getLivestockManagementAdvice } from "@/ai/flows/livestock-management-advice"
 import { optimizedPlantingRecommendations } from "@/ai/flows/optimized-planting-recommendations"
-import { cropMaintenanceSuggestions } from "@/ai/flows/crop-maintenance-suggestions"
 
 export default function AIAssistant() {
   const [loading, setLoading] = useState(false)
@@ -56,7 +55,7 @@ export default function AIAssistant() {
         <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 text-primary mb-2">
           <BrainCircuit className="h-8 w-8" />
         </div>
-        <h1 className="text-4xl font-headline font-bold text-primary">Assistente IA AgriConnect</h1>
+        <h1 className="text-4xl font-headline font-bold text-primary">Assistente IA RoçaCtrl</h1>
         <p className="text-muted-foreground text-lg">
           Insights inteligentes baseados em dados para maximizar sua produtividade rural.
         </p>
@@ -196,6 +195,3 @@ export default function AIAssistant() {
     </div>
   )
 }
-
-// Mock of the getLivestockManagementAdvice imported from flows for client usage safely
-import { getLivestockManagementAdvice } from "@/ai/flows/livestock-management-advice"
