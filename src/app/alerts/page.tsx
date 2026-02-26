@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState } from "react"
@@ -11,15 +12,20 @@ import {
   Clock, 
   AlertTriangle,
   ChevronRight,
-  Filter
+  Filter,
+  Hammer,
+  Scissors,
+  Droplets
 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 
 const alerts = [
-  { id: 1, title: "Vacinação Febre Aftosa", priority: "Alta", category: "Saúde Animal", date: "2024-02-28", status: "Pendente" },
-  { id: 2, title: "Adubação Cobertura Milho", priority: "Média", category: "Cultura", date: "2024-03-02", status: "Aguardando" },
-  { id: 3, title: "Revisão Trator John Deere", priority: "Baixa", category: "Manutenção", date: "2024-03-05", status: "Pendente" },
-  { id: 4, title: "Troca de Pasto Lote B", priority: "Média", category: "Manejo", date: "2024-03-01", status: "Concluído" },
+  { id: 1, title: "Vacinação Febre Aftosa", priority: "Alta", category: "Saúde Animal", date: "2024-02-28", status: "Pendente", icon: Bell },
+  { id: 2, title: "Adubação Cobertura Milho", priority: "Média", category: "Adubação", date: "2024-03-02", status: "Aguardando", icon: Droplets },
+  { id: 3, title: "Revisão Trator John Deere", priority: "Baixa", category: "Manutenção", date: "2024-03-05", status: "Pendente", icon: Hammer },
+  { id: 4, title: "Troca de Pasto Lote B", priority: "Média", category: "Manejo", date: "2024-03-01", status: "Concluído", icon: CheckCircle2 },
+  { id: 5, title: "Reparo de Cerca Divisa Sul", priority: "Alta", category: "Infraestrutura", date: "2024-03-04", status: "Pendente", icon: Hammer },
+  { id: 6, title: "Poda de Limpeza Pomar", priority: "Baixa", category: "Podas", date: "2024-03-10", status: "Aguardando", icon: Scissors },
 ]
 
 export default function AlertsPage() {
@@ -43,12 +49,14 @@ export default function AlertsPage() {
             <CardTitle className="text-lg">Calendário de Campo</CardTitle>
           </CardHeader>
           <CardContent>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border mx-auto"
-            />
+            <div className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -88,7 +96,12 @@ export default function AlertsPage() {
                       <span className="flex items-center gap-1">
                         <CalendarIcon className="h-3 w-3" /> {alert.date}
                       </span>
-                      <span className="font-medium text-primary uppercase tracking-tight">{alert.category}</span>
+                      <span className="font-medium text-primary uppercase tracking-tight flex items-center gap-1">
+                        {alert.category === "Infraestrutura" && <Hammer className="h-3 w-3" />}
+                        {alert.category === "Podas" && <Scissors className="h-3 w-3" />}
+                        {alert.category === "Adubação" && <Droplets className="h-3 w-3" />}
+                        {alert.category}
+                      </span>
                     </div>
                   </div>
                   <Button variant="ghost" size="icon">
@@ -97,7 +110,7 @@ export default function AlertsPage() {
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-6 variant-outline">
+            <Button className="w-full mt-6" variant="outline">
               Ver Todas as Tarefas
             </Button>
           </CardContent>

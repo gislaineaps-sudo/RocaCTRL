@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from "react"
@@ -9,7 +10,10 @@ import {
   CheckCircle2, 
   TrendingUp,
   Clock,
-  BrainCircuit
+  BrainCircuit,
+  Hammer,
+  Scissors,
+  Droplets
 } from "lucide-react"
 import { 
   BarChart, 
@@ -166,9 +170,9 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {[
-                { title: "Vacinação Febre Aftosa", date: "Em 2 dias", type: "Animal", icon: AlertCircle, color: "text-red-500" },
-                { title: "Adubação Cobertura Milho", date: "Em 5 dias", type: "Cultura", icon: Sprout, color: "text-primary" },
-                { title: "Manutenção Trator", date: "Em 1 semana", type: "Equipamento", icon: CheckCircle2, color: "text-green-500" },
+                { title: "Reparo de Cerca Divisa", date: "Hoje", type: "Infraestrutura", icon: Hammer, color: "text-red-500" },
+                { title: "Adubação Cobertura Milho", date: "Em 5 dias", type: "Adubação", icon: Droplets, color: "text-primary" },
+                { title: "Poda de Limpeza Pomar", date: "Em 1 semana", type: "Podas", icon: Scissors, color: "text-green-500" },
               ].map((alert, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-lg border bg-card/50">
                   <alert.icon className={`h-5 w-5 ${alert.color}`} />
@@ -190,10 +194,10 @@ export default function Dashboard() {
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 space-y-2">
               <div className="flex items-center gap-2 text-primary font-semibold">
                 <BrainCircuit className="h-4 w-4" />
-                <span>Otimização de Plantio</span>
+                <span>Otimização de Infraestrutura</span>
               </div>
               <p className="text-sm leading-relaxed">
-                Baseado na previsão de chuvas para os próximos 15 dias, recomendamos antecipar a semeadura da soja no setor norte para aproveitar a umidade do solo.
+                Baseado no desgaste reportado, recomendamos priorizar o reparo da cerca na divisa sul antes do início do período de rotação do gado para o Lote C.
               </p>
               <button className="text-xs font-bold text-primary hover:underline">Ver detalhes da análise</button>
             </div>
