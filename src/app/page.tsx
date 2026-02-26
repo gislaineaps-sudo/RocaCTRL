@@ -1,19 +1,22 @@
-
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { 
   Sprout, 
   PawPrint, 
-  AlertCircle, 
-  CheckCircle2, 
   TrendingUp,
   Clock,
   BrainCircuit,
   Hammer,
   Scissors,
-  Droplets
+  Droplets,
+  CloudSun,
+  ThermometerSun,
+  Wind,
+  CloudRain,
+  Loader2,
+  AlertTriangle
 } from "lucide-react"
 import { 
   BarChart, 
@@ -27,7 +30,8 @@ import {
   PieChart,
   Pie
 } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart"
+import { getWeatherAnalysis, type WeatherAnalysisOutput } from "@/ai/flows/weather-analysis"
 
 const animalData = [
   { name: "Bovinos", value: 45 },
@@ -48,11 +52,63 @@ const cropData = [
 const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "#4ADE80", "#FACC15"]
 
 export default function Dashboard() {
+  const [aiWeather, setAiWeather] = useState<WeatherAnalysisOutput | null>(null)
+  const [loadingWeather, setLoadingWeather] = useState(false)
+
+  useEffect(() => {
+    async function fetchWeatherAnalysis() {
+      setLoadingWeather(true)
+      try {
+        const analysis = await getWeatherAnalysis({
+          location: "Região Central",
+          currentWeather: "Ensolarado, 29°C, Umidade 45%",
+          forecast: "Próximos 3 dias com sol intenso, sem previsão de chuva significativa."
+        })
+        setAiWeather(analysis)
+      } catch (error) {
+        console.error("Erro ao carregar análise climática:", error)
+      } finally {
+        setLoadingWeather(false)
+      }
+    }
+    fetchWeatherAnalysis()
+  }, [])
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-headline font-bold text-primary">Dashboard Rural</h1>
-        <p className="text-muted-foreground">Visão geral da sua propriedade hoje.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-headline font-bold text-primary">Dashboard Rural</h1>
+          <p className="text-muted-foreground">Visão geral da sua propriedade hoje.</p>
+        </div>
+        
+        {/* Widget de Clima Rápido */}
+        <div className="flex items-center gap-4 bg-white p-3 rounded-xl border shadow-sm">
+          <div className="flex items-center gap-2 pr-4 border-r">
+            <CloudSun className="h-8 w-8 text-orange-500" />
+            <div>
+              <p className="text-2xl font-bold leading-none">29°C</p>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold">Ensolarado</p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <div className="text-center">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase">Ter</p>
+              <CloudSun className="h-4 w-4 mx-auto text-orange-400" />
+              <p className="text-xs font-bold">31°</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase">Qua</p>
+              <CloudRain className="h-4 w-4 mx-auto text-blue-400" />
+              <p className="text-xs font-bold">24°</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase">Qui</p>
+              <ThermometerSun className="h-4 w-4 mx-auto text-red-400" />
+              <p className="text-xs font-bold">33°</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -163,18 +219,78 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Próximos Alertas</CardTitle>
+        {/* Alertas Climáticos Inteligentes */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="space-y-0.5">
+              <CardTitle className="font-headline text-lg flex items-center gap-2">
+                <BrainCircuit className="h-5 w-5 text-primary" />
+                Análise Agroclimática IA
+              </CardTitle>
+              <CardDescription>Insights baseados na previsão local</CardDescription>
+            </div>
+            {aiWeather && (
+              <div className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                aiWeather.riskLevel === 'Alto' ? 'bg-red-100 text-red-600' : 
+                aiWeather.riskLevel === 'Moderado' ? 'bg-yellow-100 text-yellow-600' : 'bg-green-100 text-green-600'
+              }`}>
+                Risco {aiWeather.riskLevel}
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            {loadingWeather ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+              </div>
+            ) : aiWeather ? (
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-primary/10">
+                  <p className="text-sm leading-relaxed italic text-muted-foreground">
+                    "{aiWeather.advice}"
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Ações Prioritárias</p>
+                    <ul className="space-y-1">
+                      {aiWeather.priorityTasks.map((task, i) => (
+                        <li key={i} className="text-xs flex items-center gap-2 font-medium">
+                          <div className="h-1 w-1 rounded-full bg-primary" />
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-orange-600 bg-orange-50 p-2 rounded border border-orange-100">
+                      <Wind className="h-3 w-3" />
+                      Ventos constantes: 12km/h
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground flex flex-col items-center gap-2">
+                <AlertTriangle className="h-5 w-5 opacity-40" />
+                <p className="text-xs">Não foi possível gerar a análise climática agora.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline text-lg">Próximos Alertas de Rotina</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
               {[
                 { title: "Reparo de Cerca Divisa", date: "Hoje", type: "Infraestrutura", icon: Hammer, color: "text-red-500" },
                 { title: "Adubação Cobertura Milho", date: "Em 5 dias", type: "Adubação", icon: Droplets, color: "text-primary" },
                 { title: "Poda de Limpeza Pomar", date: "Em 1 semana", type: "Podas", icon: Scissors, color: "text-green-500" },
               ].map((alert, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg border bg-card/50">
+                <div key={i} className="flex items-center gap-4 p-3 rounded-lg border bg-card/50 hover:bg-muted/50 transition-colors">
                   <alert.icon className={`h-5 w-5 ${alert.color}`} />
                   <div className="flex-1">
                     <p className="text-sm font-semibold">{alert.title}</p>
@@ -182,24 +298,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Sugestão da IA</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 space-y-2">
-              <div className="flex items-center gap-2 text-primary font-semibold">
-                <BrainCircuit className="h-4 w-4" />
-                <span>Otimização de Infraestrutura</span>
-              </div>
-              <p className="text-sm leading-relaxed">
-                Baseado no desgaste reportado, recomendamos priorizar o reparo da cerca na divisa sul antes do início do período de rotação do gado para o Lote C.
-              </p>
-              <button className="text-xs font-bold text-primary hover:underline">Ver detalhes da análise</button>
             </div>
           </CardContent>
         </Card>
