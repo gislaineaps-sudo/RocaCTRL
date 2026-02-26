@@ -10,6 +10,7 @@ import {
   Settings,
   HelpCircle,
   Menu,
+  Library
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -30,6 +31,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Animais", href: "/animals", icon: PawPrint },
   { name: "Culturas", href: "/crops", icon: Sprout },
+  { name: "Categorias", href: "/categories", icon: Library },
   { name: "Alertas", href: "/alerts", icon: Bell },
   { name: "Assistente IA", href: "/ai-assistant", icon: BrainCircuit },
 ]
