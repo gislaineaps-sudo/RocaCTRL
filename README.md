@@ -39,7 +39,11 @@ Para automatizar o deploy e manter sua aplicação sempre atualizada:
 3. **Importante**: O App Hosting exige que o seu projeto esteja no **Plano Blaze**. Clique em "Fazer upgrade" no console.
 4. Clique em "Começar" e conecte sua conta do GitHub.
 5. Selecione o repositório `RocaCTRL`.
-6. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
+6. Na tela de **Configurações de implantação** (Passo 3):
+   - **Ramificação ativa**: digite `main`
+   - **Diretório raiz do app**: deixe `/`
+   - Clique em **Avançar**.
+7. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
 
 ## 👀 Como verificar se deu certo?
 
