@@ -23,7 +23,7 @@ git commit -m "Initial commit: RoçaCtrl MVP com suporte a IoT e IA"
 ```
 
 ### 4. Conecte ao seu GitHub e envie os arquivos
-Execute os comandos abaixo (certifique-se de que o repositório `RocaCTRL` já foi criado no seu GitHub):
+Execute os comandos abaixo:
 ```bash
 git remote add origin https://github.com/gislaineaps-sudo/RocaCTRL.git
 git branch -M main
@@ -38,7 +38,10 @@ Para automatizar o deploy e manter sua aplicação sempre atualizada:
 2. No menu lateral, procure por **App Hosting**.
 3. Clique em "Começar" e conecte sua conta do GitHub.
 4. Selecione o repositório `RocaCTRL`.
-5. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático para a URL de produção.
+5. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
+
+## 💰 Custos e Hospedagem
+O Firebase oferece o plano **Spark (Gratuito)**, que inclui limites generosos para projetos pequenos. Para o uso do RoçaCtrl em uma pequena propriedade, é muito provável que você permaneça dentro da cota gratuita. Caso o tráfego aumente muito, o plano **Blaze** cobra apenas centavos pelo que for excedido.
 
 ## 📱 Funcionalidades Implementadas
 - **Dashboard**: Visão geral com métricas de produção real vs. meta e análise agroclimática.
