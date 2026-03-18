@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -9,16 +10,24 @@ import { Button } from "@/components/ui/button"
 
 export default function IoTPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [sensors, setSensors] = useState({
     moisture: 42,
     temp: 27.5,
     water: 85,
-    lastUpdate: new Date().toLocaleTimeString()
+    lastUpdate: ""
   })
+
+  useEffect(() => {
+    setMounted(true)
+    setSensors(prev => ({
+      ...prev,
+      lastUpdate: new Date().toLocaleTimeString()
+    }))
+  }, [])
 
   const refreshData = () => {
     setIsRefreshing(true)
-    // Simula chamada de API de sensores IoT
     setTimeout(() => {
       setSensors({
         moisture: Math.floor(Math.random() * (60 - 30) + 30),
@@ -29,6 +38,8 @@ export default function IoTPage() {
       setIsRefreshing(false)
     }, 1000)
   }
+
+  if (!mounted) return null
 
   return (
     <div className="space-y-6">
