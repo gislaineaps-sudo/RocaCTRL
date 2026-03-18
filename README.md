@@ -25,7 +25,7 @@ git commit -m "Initial commit: RoçaCtrl MVP com suporte a IoT e IA"
 ### 4. Conecte ao seu GitHub e envie os arquivos
 Execute os comandos abaixo (certifique-se de que o repositório `RocaCTRL` já foi criado no seu GitHub):
 ```bash
-git remote add origin https://github.com/seu-usuario/RocaCTRL.git
+git remote add origin https://github.com/gislaineaps-sudo/RocaCTRL.git
 git branch -M main
 git push -u origin main
 ```
