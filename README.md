@@ -40,6 +40,16 @@ Para automatizar o deploy e manter sua aplicação sempre atualizada:
 4. Selecione o repositório `RocaCTRL`.
 5. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
 
+## 👀 Como verificar se deu certo?
+
+Após o `git push`, você pode acompanhar o progresso:
+
+1. No **Console do Firebase**, clique em **App Hosting**.
+2. Você verá uma seção chamada **Rollouts**.
+3. Um item aparecerá com o status "Pendente" ou "Em andamento".
+4. Clique no número do Rollout para ver os **Logs de Build** (detalhes técnicos do que está acontecendo).
+5. Assim que o status mudar para **Sucesso**, o link oficial do seu site aparecerá no topo da página (ex: `roca-ctrl.web.app`).
+
 ## 💰 Custos e Hospedagem
 O Firebase oferece o plano **Spark (Gratuito)**, que inclui limites generosos para projetos pequenos. Para o uso do RoçaCtrl em uma pequena propriedade, é muito provável que você permaneça dentro da cota gratuita. Caso o tráfego aumente muito, o plano **Blaze** cobra apenas centavos pelo que for excedido.
 
