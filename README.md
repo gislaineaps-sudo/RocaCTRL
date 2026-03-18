@@ -2,9 +2,27 @@
 
 Este é um sistema inteligente para gestão de hortas, pomares e pequenos rebanhos, focado no pequeno produtor e agricultura familiar. O sistema integra monitoramento IoT, análise climática e um assistente de IA para otimizar a produção em pequenas propriedades.
 
-## 🚀 Como configurar o Git e Conectar ao GitHub (No seu Computador)
+## ⚠️ CORRIGINDO O ERRO: Git iniciado na pasta errada (C:\Users\...)
 
-Siga este passo a passo no **terminal da sua máquina** (dentro da pasta do projeto) para enviar os arquivos para o seu repositório:
+Se você viu mensagens de "Permission denied" ou arquivos como "AppData" e "Documents" no terminal (como na sua imagem), siga estes passos para limpar e recomeçar corretamente:
+
+### 1. Remova o Git da sua pasta de usuário
+No terminal onde você está (`C:\Users\silvagi`), digite exatamente isto para parar de monitorar seu computador inteiro:
+```bash
+rd /s /q .git
+```
+
+### 2. Crie uma pasta para o projeto e entre nela
+Agora, vamos criar um lugar só para o RoçaCtrl:
+```bash
+mkdir RocaCTRL
+cd RocaCTRL
+```
+
+### 3. Agora sim, inicialize e envie o código
+Agora que você está dentro da pasta `C:\Users\silvagi\RocaCTRL`, siga os passos abaixo:
+
+## 🚀 Como configurar o Git Corretamente
 
 ### 1. Inicialize o Repositório Local
 ```bash
@@ -12,6 +30,7 @@ git init
 ```
 
 ### 2. Adicione os Arquivos ao "Stage"
+*(Certifique-se de que os arquivos do projeto que você baixou/editou estão dentro desta pasta RocaCTRL)*
 ```bash
 git add .
 ```
@@ -21,8 +40,7 @@ git add .
 git commit -m "Initial commit: RoçaCtrl MVP com suporte a IoT e IA"
 ```
 
-### 4. Conecte ao seu GitHub e envie os arquivos (IMPORTANTE)
-**Atenção:** Você precisa executar estes comandos no terminal ANTES de concluir a configuração no Console do Firebase:
+### 4. Conecte ao seu GitHub e envie (IMPORTANTE)
 ```bash
 git remote add origin https://github.com/gislaineaps-sudo/RocaCTRL.git
 git branch -M main
@@ -35,27 +53,17 @@ Para automatizar o deploy:
 
 1. Vá ao [Console do Firebase](https://console.firebase.google.com/).
 2. No menu lateral, procure por **App Hosting**.
-3. Faça o upgrade para o **Plano Blaze** (Necessário para usar o serviço).
+3. Faça o upgrade para o **Plano Blaze**.
 4. Conecte sua conta do GitHub e selecione o repositório `RocaCTRL`.
-5. Na tela de **Configurações de implantação** (Passo 3):
+5. Na tela de **Configurações de implantação**:
    - **Ramificação ativa**: digite `main`
    - **Diretório raiz do app**: deixe `/`
    - Clique em **Avançar**.
 
-## ❌ Resolvendo o Erro: "O nome da ramificação precisa se referir a uma ramificação válida"
-
-Se você vir uma mensagem vermelha no Firebase dizendo que a ramificação não é válida:
-
-1. **Verifique o Push**: Volte ao terminal do seu computador e confirme se você rodou o comando `git push -u origin main` e se ele terminou com sucesso.
-2. **Atualize a Página**: O Firebase só reconhece a branch `main` se ela já existir no GitHub. Se você acabou de dar o push, aguarde 30 segundos e atualize a página do console do Firebase.
-3. **Verifique o Nome**: No terminal, digite `git branch`. O nome que aparecer com um asterisco (ex: `* main`) é o que você deve digitar no campo do Firebase.
+## ❌ Solução de Problemas no Firebase
+Se o Firebase disser que a ramificação não é válida:
+1. **Verifique o Push**: Confirme se o comando `git push` no terminal terminou com "Success".
+2. **Atualize a Página**: Aguarde 30 segundos e atualize o console do Firebase.
 
 ## 💰 Custos e Plano Blaze
-O Firebase App Hosting exige o **Plano Blaze**. Embora exija um cartão para verificação, o Google oferece uma **cota gratuita** generosa. Para o uso do RoçaCtrl em pequena escala, é muito provável que sua cobrança mensal seja de **R$ 0,00**.
-
-## 👀 Como verificar se deu certo?
-
-Após o sucesso na configuração:
-1. No **Console do Firebase**, clique em **App Hosting**.
-2. Acompanhe o status em **Rollouts**.
-3. Assim que o status mudar para **Sucesso**, seu link (ex: `roca-ctrl.web.app`) estará ativo!
+O Firebase App Hosting exige o **Plano Blaze**. Embora exija um cartão, o Google oferece uma **cota gratuita** generosa. É muito provável que sua cobrança seja de **R$ 0,00** para uso em pequena escala.
