@@ -12,7 +12,6 @@ git init
 ```
 
 ### 2. Adicione os Arquivos ao "Stage"
-O arquivo `.gitignore` já está configurado para ignorar arquivos desnecessários:
 ```bash
 git add .
 ```
@@ -22,8 +21,8 @@ git add .
 git commit -m "Initial commit: RoçaCtrl MVP com suporte a IoT e IA"
 ```
 
-### 4. Conecte ao seu GitHub e envie os arquivos
-Execute os comandos abaixo:
+### 4. Conecte ao seu GitHub e envie os arquivos (IMPORTANTE)
+**Atenção:** Você precisa executar estes comandos ANTES de configurar o Firebase:
 ```bash
 git remote add origin https://github.com/gislaineaps-sudo/RocaCTRL.git
 git branch -M main
@@ -32,38 +31,31 @@ git push -u origin main
 
 ## 🛠️ Configurando CI/CD com Firebase App Hosting
 
-Para automatizar o deploy e manter sua aplicação sempre atualizada:
+Para automatizar o deploy:
 
 1. Vá ao [Console do Firebase](https://console.firebase.google.com/).
 2. No menu lateral, procure por **App Hosting**.
-3. **Importante**: O App Hosting exige que o seu projeto esteja no **Plano Blaze**. Clique em "Fazer upgrade" no console.
-4. Clique em "Começar" e conecte sua conta do GitHub.
-5. Selecione o repositório `RocaCTRL`.
-6. Na tela de **Configurações de implantação** (Passo 3):
+3. Faça o upgrade para o **Plano Blaze**.
+4. Conecte sua conta do GitHub e selecione o repositório `RocaCTRL`.
+5. Na tela de **Configurações de implantação** (Passo 3):
    - **Ramificação ativa**: digite `main`
    - **Diretório raiz do app**: deixe `/`
    - Clique em **Avançar**.
-7. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
+
+## ❌ Resolvendo o Erro: "O nome da ramificação precisa se referir a uma ramificação válida"
+
+Se você vir uma mensagem vermelha dizendo que a ramificação não é válida (como na imagem que você viu), siga estes passos:
+
+1. **Verifique o Push**: Volte ao seu terminal e confirme se você rodou o comando `git push -u origin main`. O Firebase só reconhece a branch `main` se ela já existir no GitHub.
+2. **Atualize a Página**: Se você acabou de dar o push, aguarde 30 segundos e atualize a página do console do Firebase.
+3. **Verifique o Nome**: No terminal, digite `git branch`. O nome que aparecer com um asterisco (ex: `* main`) é o que você deve digitar no campo do Firebase.
 
 ## 👀 Como verificar se deu certo?
 
-Após o `git push`, você pode acompanhar o progresso:
-
+Após o sucesso na configuração:
 1. No **Console do Firebase**, clique em **App Hosting**.
-2. Você verá uma seção chamada **Rollouts**.
-3. Um item aparecerá com o status "Pendente" ou "Em andamento".
-4. Clique no número do Rollout para ver os **Logs de Build** (detalhes técnicos do que está acontecendo).
-5. Assim que o status mudar para **Sucesso**, o link oficial do seu site aparecerá no topo da página (ex: `roca-ctrl.web.app`).
+2. Acompanhe o status em **Rollouts**.
+3. Assim que o status mudar para **Sucesso**, seu link (ex: `roca-ctrl.web.app`) estará ativo!
 
 ## 💰 Custos e Plano Blaze
-O Firebase App Hosting requer o **Plano Blaze (pago conforme o uso)**. 
-- **Por que o upgrade?** O serviço utiliza recursos como Cloud Run e Cloud Build que exigem esse plano para serem ativados.
-- **Vou pagar?** O Google oferece uma **cota gratuita** mensal para esses recursos. Para o uso do RoçaCtrl em uma pequena propriedade ou chácara, é muito provável que seu uso mensal fique **dentro da faixa gratuita**, resultando em uma cobrança de R$ 0,00 na maioria dos meses.
-
-## 📱 Funcionalidades Implementadas
-- **Dashboard**: Visão geral com métricas de produção real vs. meta e análise agroclimática.
-- **Gestão de Animais**: Organização por categorias e espécies (Avicultura, Piscicultura, etc.).
-- **Hortas e Pomares**: Controle de ciclo de vida para agricultura familiar e pequenas áreas.
-- **Monitoramento IoT**: Painel de sensores de umidade do solo, temperatura e nível de água.
-- **Assistente IA**: Recomendações personalizadas para plantio e manejo de rebanho via Genkit.
-- **API de Integração**: Endpoint `/api/stats` para conexões com sistemas externos.
+O Firebase App Hosting exige o **Plano Blaze**. Embora exija um cartão para verificação, o Google oferece uma **cota gratuita** generosa. Para o uso do RoçaCtrl em pequena escala, é muito provável que sua cobrança mensal seja de **R$ 0,00**.
