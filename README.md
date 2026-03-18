@@ -36,9 +36,10 @@ Para automatizar o deploy e manter sua aplicação sempre atualizada:
 
 1. Vá ao [Console do Firebase](https://console.firebase.google.com/).
 2. No menu lateral, procure por **App Hosting**.
-3. Clique em "Começar" e conecte sua conta do GitHub.
-4. Selecione o repositório `RocaCTRL`.
-5. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
+3. **Importante**: O App Hosting exige que o seu projeto esteja no **Plano Blaze**. Clique em "Fazer upgrade" no console.
+4. Clique em "Começar" e conecte sua conta do GitHub.
+5. Selecione o repositório `RocaCTRL`.
+6. O Firebase configurará automaticamente um pipeline de CI/CD: cada `git push` na branch `main` disparará um novo build e deploy automático.
 
 ## 👀 Como verificar se deu certo?
 
@@ -50,8 +51,10 @@ Após o `git push`, você pode acompanhar o progresso:
 4. Clique no número do Rollout para ver os **Logs de Build** (detalhes técnicos do que está acontecendo).
 5. Assim que o status mudar para **Sucesso**, o link oficial do seu site aparecerá no topo da página (ex: `roca-ctrl.web.app`).
 
-## 💰 Custos e Hospedagem
-O Firebase oferece o plano **Spark (Gratuito)**, que inclui limites generosos para projetos pequenos. Para o uso do RoçaCtrl em uma pequena propriedade, é muito provável que você permaneça dentro da cota gratuita. Caso o tráfego aumente muito, o plano **Blaze** cobra apenas centavos pelo que for excedido.
+## 💰 Custos e Plano Blaze
+O Firebase App Hosting requer o **Plano Blaze (pago conforme o uso)**. 
+- **Por que o upgrade?** O serviço utiliza recursos como Cloud Run e Cloud Build que exigem esse plano para serem ativados.
+- **Vou pagar?** O Google oferece uma **cota gratuita** mensal para esses recursos. Para o uso do RoçaCtrl em uma pequena propriedade ou chácara, é muito provável que seu uso mensal fique **dentro da faixa gratuita**, resultando em uma cobrança de R$ 0,00 na maioria dos meses.
 
 ## 📱 Funcionalidades Implementadas
 - **Dashboard**: Visão geral com métricas de produção real vs. meta e análise agroclimática.
