@@ -21,7 +21,11 @@
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
-      # "vscodevim.vim"
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "mtxr.sqltools",
+      "mtxr.sqltools-driver-pg"
     ];
     workspace = {
       onCreate = {

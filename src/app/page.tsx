@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { 
   Sprout, 
@@ -82,9 +83,18 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
-          <p className="text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
+        <div className="flex items-center gap-6">
+          <Image 
+            src="/logo.jpg" 
+            alt="Logo RoçaCTRL" 
+            width={140} 
+            height={140} 
+            className="rounded-full shadow-lg object-cover border-4 border-primary/20 aspect-square"
+          />
+          <div>
+            <h1 className="text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
+            <p className="text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
+          </div>
         </div>
         
         <div className="flex items-center gap-4 bg-white p-3 rounded-xl border shadow-sm">
