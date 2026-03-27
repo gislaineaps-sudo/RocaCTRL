@@ -11,14 +11,20 @@ Como você está editando aqui no Firebase Studio, o código **ainda não está 
 1. Procure no **canto superior direito** da tela por um ícone de **nuvem com uma seta para baixo** (Download Source).
 2. Clique nele para baixar o arquivo `.zip` com todo o seu código atualizado.
 
-### 2. Prepare os arquivos na pasta correta
+### 2. Prepare os arquivos na pasta correta (PASSO MAIS IMPORTANTE)
 1. Abra o arquivo `.zip` que você baixou.
-2. **Copie todos os arquivos e pastas** (src, public, package.json, etc.) de dentro do zip.
-3. Cole-os diretamente dentro da sua pasta: `C:\Users\silvagi\RocaCTRL`.
-   - *Importante: Não crie outra pasta RocaCTRL dentro dela. Os arquivos devem estar direto em `C:\Users\silvagi\RocaCTRL`.*
+2. **Copie TODOS os arquivos e pastas** que estão lá dentro. Isso inclui:
+   - Pasta `src`
+   - Pasta `public`
+   - Arquivo `package.json`
+   - Arquivo `tailwind.config.ts`
+   - Arquivo `tsconfig.json`
+   - E todos os outros arquivos que terminam com `.json` ou `.ts`.
+3. Vá na sua pasta `C:\Users\silvagi\RocaCTRL` e **cole tudo lá dentro**.
+   - *Atenção: Os arquivos devem estar diretamente em `C:\Users\silvagi\RocaCTRL`, e não dentro de outra pasta chamada RocaCTRL.*
 
 ### 3. Execute os comandos no Terminal
-Agora que os arquivos estão no lugar certo, abra o terminal e digite estes comandos:
+Agora que os arquivos estão no lugar certo, abra o terminal e digite estes comandos um por um:
 
 ```bash
 # 1. Entre na pasta correta
