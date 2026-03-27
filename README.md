@@ -4,34 +4,39 @@ Este é um sistema inteligente para gestão de hortas, pomares e pequenos rebanh
 
 ## 🚀 Como configurar o seu computador e enviar para o GitHub
 
-O erro **"nothing to commit"** que você viu acontece porque a pasta no seu computador está vazia. Siga estes passos exatos:
+Se você viu a mensagem "O sistema não pode encontrar o arquivo especificado" ou "nothing to commit", siga estes passos exatos:
 
-### 1. Obtenha os arquivos do projeto
-Como você está editando aqui no Firebase Studio, você precisa baixar o código para o seu computador primeiro:
-- Clique no botão de **Download** (ícone de nuvem com seta ou "Download Source") aqui na interface do Firebase Studio para baixar o arquivo `.zip`.
-- Extraia (descompacte) todo o conteúdo desse arquivo `.zip` para dentro da sua pasta: `C:\Users\silvagi\RocaCTRL`.
+### 1. Prepare os arquivos (O passo mais importante!)
+Como você está editando aqui no Firebase Studio, o código **ainda não está no seu computador**.
+1. Clique no botão de **Download** (ícone de nuvem com seta ou "Download Source") aqui no canto superior do Firebase Studio.
+2. Você vai baixar um arquivo `.zip`.
+3. Abra esse `.zip` e **extraia/copie todos os arquivos** para dentro da sua pasta: `C:\Users\silvagi\RocaCTRL`.
 
-### 2. Configure o Git corretamente
-Agora que os arquivos estão na pasta, abra o terminal e digite:
+### 2. Configure o Git corretamente no Terminal
+Agora que os arquivos estão na pasta, abra o terminal e digite estes comandos um por um:
 
 ```bash
-# Certifique-se de estar na pasta certa (onde você extraiu os arquivos)
+# 1. Entre na pasta onde você colocou os arquivos
 cd C:\Users\silvagi\RocaCTRL
 
-# Inicie o Git
+# 2. Inicie o Git (apenas nesta pasta!)
 git init
 
-# Adicione todos os arquivos (agora eles existem!)
+# 3. Adicione os arquivos (agora o comando vai encontrar os arquivos que você baixou)
 git add .
 
-# Salve a primeira versão
+# 4. Salve a primeira versão
 git commit -m "Initial commit: RoçaCtrl MVP com suporte a IoT e IA"
 
-# Conecte ao seu GitHub e envie
+# 5. Conecte ao seu GitHub e envie (use o link do SEU repositório)
 git remote add origin https://github.com/gislaineaps-sudo/RocaCTRL.git
 git branch -M main
 git push -u origin main
 ```
+
+### 3. O que fazer se der erro?
+- **"nothing to commit"**: Significa que a pasta `RocaCTRL` está vazia. Você esqueceu de baixar o código do Firebase Studio e colar lá dentro.
+- **"fatal: remote origin already exists"**: Digite `git remote remove origin` e depois tente o passo 5 novamente.
 
 ## 🛠️ Configurando CI/CD com Firebase App Hosting
 
@@ -39,11 +44,8 @@ Para automatizar o deploy:
 
 1. Vá ao [Console do Firebase](https://console.firebase.google.com/).
 2. No menu lateral, procure por **App Hosting**.
-3. Faça o upgrade para o **Plano Blaze**.
+3. Faça o upgrade para o **Plano Blaze** (Cota gratuita generosa, geralmente R$ 0,00 para este app).
 4. Conecte sua conta do GitHub e selecione o repositório `RocaCTRL`.
 5. Na tela de **Configurações de implantação**:
    - **Ramificação ativa**: digite `main`
    - **Diretório raiz do app**: deixe `/`
-
-## 💰 Custos e Plano Blaze
-O Firebase App Hosting exige o **Plano Blaze**. Embora exija um cartão para verificação, o Google oferece uma **cota gratuita** generosa. É muito provável que sua cobrança seja de **R$ 0,00** para uso em pequena escala.
