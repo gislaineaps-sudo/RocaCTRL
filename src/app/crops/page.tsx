@@ -175,9 +175,10 @@ export default function CropsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex-1 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase text-muted-foreground">Fase Atual</h4>
+              <div className="flex-1 flex flex-col">
+                <div className="flex-1 p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Fase Atual</h4>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <ArrowUpRight className="h-5 w-5" />
@@ -297,7 +298,8 @@ export default function CropsPage() {
                 </Dialog>
               </div>
 
-            </div>
+                </div>
+              </div>
           </Card>
         ))}
       </div>
