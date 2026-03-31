@@ -34,13 +34,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const CATEGORIES_DATA = {
+const CATEGORIES_DATA: Record<string, string[]> = {
   "Avicultura": ["Galinha Caipira", "Galinha de Angola", "Codorna", "Pato", "Ganso", "Peru"],
-  "Cunicultura": ["Coelho Nova Zelândia", "Coelho Gigante de Flandres"],
-  "Apicultura": ["Abelha Europa (Apis)", "Abelha Jataí", "Abelha Mandaçaia"],
-  "Pequenos Ruminantes": ["Cabra Saanen", "Cabra Alpina", "Ovelha Santa Inês"],
-  "Piscicultura": ["Tilápia", "Tambaqui", "Carpa"],
-  "Ranicultura": ["Rã-touro"]
+  "Bovinocultura": ["Gado de Corte", "Gado Leiteiro", "Búfalo"],
+  "Equideocultura": ["Cavalo de Sela", "Cavalo de Tração", "Mula / Jumento"],
+  "Suinocultura": ["Porco Caipira", "Porco Comercial"],
+  "Pequenos Ruminantes": ["Cabra", "Ovelha", "Lhama", "Alpaca"],
+  "Cunicultura (Coelhos)": ["Coelho Nova Zelândia", "Coelho Gigante"],
+  "Apicultura (Abelhas)": ["Abelha Apis (Europa)", "Abelha Jataí", "Abelha Mandaçaia"],
+  "Piscicultura": ["Tilápia", "Tambaqui", "Carpa", "Pacu"],
+  "Ranicultura": ["Rã-touro"],
+  "Sericicultura": ["Bicho-da-seda"],
+  "Canil / Cães de Trabalho": ["Cão Pastor", "Cão de Guarda", "Cão Cingueiro"],
+  "Outro (Personalizado)": ["Adicionar Manualmente..."]
 }
 
 const initialAnimals = [
@@ -61,17 +67,25 @@ export default function AnimalsPage() {
   const [newAnimalCategory, setNewAnimalCategory] = useState<string>("")
   const [newAnimalSpecies, setNewAnimalSpecies] = useState<string>("")
   const [newAge, setNewAge] = useState("")
+  const [customCategory, setCustomCategory] = useState("")
+  const [customSpecies, setCustomSpecies] = useState("")
 
   const handleSave = () => {
-    if (!newName || !newAnimalCategory || !newAnimalSpecies || !newAge) return
+    if (!newName || !newAge) return
     
-    const newId = `${newAnimalCategory.substring(0,3).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+    // Tratamento para opção "Outro (Personalizado)"
+    const finalCategory = newAnimalCategory === "Outro (Personalizado)" && customCategory ? customCategory : newAnimalCategory
+    const finalSpecies = (newAnimalCategory === "Outro (Personalizado)" || newAnimalSpecies === "Adicionar Manualmente...") && customSpecies ? customSpecies : newAnimalSpecies
+
+    if (!finalCategory || !finalSpecies) return
+
+    const newId = `${finalCategory.substring(0,3).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
     
     const newAnimal = {
       id: newId,
       name: newName,
-      category: newAnimalCategory,
-      species: newAnimalSpecies,
+      category: finalCategory,
+      species: finalSpecies,
       age: parseInt(newAge),
       status: "Saudável",
       lastCheck: new Date().toISOString().split('T')[0]
@@ -85,6 +99,8 @@ export default function AnimalsPage() {
     setNewAnimalCategory("")
     setNewAnimalSpecies("")
     setNewAge("")
+    setCustomCategory("")
+    setCustomSpecies("")
   }
 
   const filteredAnimals = useMemo(() => {
@@ -130,7 +146,7 @@ export default function AnimalsPage() {
               
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">Categoria</Label>
-                <div className="col-span-3">
+                <div className="col-span-3 space-y-2">
                   <Select 
                     value={newAnimalCategory}
                     onValueChange={(val) => {
@@ -146,14 +162,21 @@ export default function AnimalsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {newAnimalCategory === "Outro (Personalizado)" && (
+                    <Input 
+                      placeholder="Qual categoria? (ex: Extrativismo)" 
+                      value={customCategory} 
+                      onChange={(e) => setCustomCategory(e.target.value)} 
+                    />
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="species" className="text-right">Espécie</Label>
-                <div className="col-span-3">
+                <Label htmlFor="species" className="text-right">Espécie/Tipo</Label>
+                <div className="col-span-3 space-y-2">
                   <Select 
-                    disabled={!newAnimalCategory} 
+                    disabled={!newAnimalCategory && newAnimalCategory !== "Outro (Personalizado)"} 
                     onValueChange={setNewAnimalSpecies} 
                     value={newAnimalSpecies}
                   >
@@ -161,11 +184,18 @@ export default function AnimalsPage() {
                       <SelectValue placeholder={newAnimalCategory ? "Selecione a Espécie" : "Aguardando categoria..."} />
                     </SelectTrigger>
                     <SelectContent>
-                      {newAnimalCategory && CATEGORIES_DATA[newAnimalCategory as keyof typeof CATEGORIES_DATA].map(spec => (
+                      {newAnimalCategory && CATEGORIES_DATA[newAnimalCategory as keyof typeof CATEGORIES_DATA]?.map(spec => (
                         <SelectItem key={spec} value={spec}>{spec}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {(newAnimalSpecies === "Adicionar Manualmente..." || newAnimalCategory === "Outro (Personalizado)") && (
+                    <Input 
+                      placeholder="Qual espécie/tipo? (ex: Borboleta azul)" 
+                      value={customSpecies} 
+                      onChange={(e) => setCustomSpecies(e.target.value)} 
+                    />
+                  )}
                 </div>
               </div>
 

@@ -44,13 +44,17 @@ export default function CropsPage() {
   const [newName, setNewName] = useState("")
   const [newType, setNewType] = useState("")
   const [newArea, setNewArea] = useState("")
+  const [customType, setCustomType] = useState("")
 
   const handleSave = () => {
     if (!newName || !newType || !newArea) return
+    
+    const finalType = newType === "Outro (Personalizado)" && customType ? customType : newType
+
     const newCrop = {
       id: Date.now(),
       name: newName,
-      type: newType,
+      type: finalType,
       stage: "Plantio Inicial",
       progress: 0,
       area: newArea,
@@ -62,6 +66,7 @@ export default function CropsPage() {
     setNewName("")
     setNewType("")
     setNewArea("")
+    setCustomType("")
   }
 
   return (
@@ -97,18 +102,31 @@ export default function CropsPage() {
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">Tipo</Label>
-                  <div className="col-span-3">
+                  <Label htmlFor="type" className="text-right">Categoria</Label>
+                  <div className="col-span-3 space-y-2">
                     <Select value={newType} onValueChange={setNewType}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione Categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Horta">Horta</SelectItem>
-                        <SelectItem value="Pomar">Pomar</SelectItem>
-                        <SelectItem value="Ervas">Ervas</SelectItem>
+                        <SelectItem value="Hortaliças (Verduras/Legumes)">Hortaliças (Verduras/Legumes)</SelectItem>
+                        <SelectItem value="Pomar (Frutíferas)">Pomar (Frutíferas)</SelectItem>
+                        <SelectItem value="Ervas Medicinais / Temperos">Ervas Medicinais / Temperos</SelectItem>
+                        <SelectItem value="Fungicultura (Cogumelos)">Fungicultura (Cogumelos)</SelectItem>
+                        <SelectItem value="Cereais / Grãos (Milho/Soja)">Cereais / Grãos (Milho/Soja)</SelectItem>
+                        <SelectItem value="Raízes / Tubérculos (Mandioca)">Raízes / Tubérculos (Mandioca)</SelectItem>
+                        <SelectItem value="Floricultura (Flores)">Floricultura (Flores)</SelectItem>
+                        <SelectItem value="Silvicultura (Madeira/Eucalipto)">Silvicultura (Madeira/Eucalipto)</SelectItem>
+                        <SelectItem value="Outro (Personalizado)">Outro (Adicionar Manualmente...)</SelectItem>
                       </SelectContent>
                     </Select>
+                    {newType === "Outro (Personalizado)" && (
+                      <Input 
+                        placeholder="Nome da categoria (ex: Hidroponia)" 
+                        value={customType}
+                        onChange={(e) => setCustomType(e.target.value)}
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
