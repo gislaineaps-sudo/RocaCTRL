@@ -47,19 +47,14 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b px-4 py-4">
         <div className="flex items-center gap-2 overflow-hidden">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary/10">
-            {logoImage ? (
-              <Image 
-                src={logoImage.imageUrl} 
-                alt={logoImage.description} 
-                width={32} 
-                height={32} 
-                className="object-cover"
-                data-ai-hint={logoImage.imageHint}
-              />
-            ) : (
-              <Sprout className="h-5 w-5 text-primary" />
-            )}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/20 bg-primary/10">
+            <Image 
+              src="/logo.jpg" 
+              alt="Logo RoçaCtrl" 
+              width={32} 
+              height={32} 
+              className="object-cover h-full w-full scale-[1.3]"
+            />
           </div>
           {state === "expanded" && (
             <span className="font-headline font-bold text-lg text-primary truncate">
