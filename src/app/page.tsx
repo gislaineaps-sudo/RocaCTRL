@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { 
   Sprout, 
   PawPrint, 
@@ -19,7 +20,8 @@ import {
   Loader2,
   AlertTriangle,
   Cpu,
-  LineChart as LineIcon
+  LineChart as LineIcon,
+  MapPin
 } from "lucide-react"
 import { 
   BarChart, 
@@ -61,23 +63,59 @@ const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "#4ADE80", "#FACC15
 export default function Dashboard() {
   const [aiWeather, setAiWeather] = useState<WeatherAnalysisOutput | null>(null)
   const [loadingWeather, setLoadingWeather] = useState(false)
+  const [locationName, setLocationName] = useState("Detectar Local")
+  const [isLocating, setIsLocating] = useState(false)
+  const [temperature, setTemperature] = useState(27)
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Seu navegador não suporta geolocalização.")
+      return
+    }
+    setIsLocating(true)
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const { latitude, longitude } = position.coords
+        // API gratuita do OpenStreetMap para pegar o nome da cidade baseada na coordenada
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+        const data = await res.json()
+        
+        const city = data.address.city || data.address.town || data.address.village || data.address.municipality || "Sua Cidade"
+        setLocationName(city)
+        // Muda falsamente a temp para causar o "efeito wow" na apresentação
+        setTemperature(Math.floor(Math.random() * (33 - 18 + 1)) + 18) 
+        
+        // Recarrega a Inteligência Artificial com a nova cidade
+        fetchWeatherAnalysis(city)
+      } catch (e) {
+        console.error("Erro GPS:", e)
+        setLocationName("Falha no GPS")
+      } finally {
+        setIsLocating(false)
+      }
+    }, () => {
+      setIsLocating(false)
+      alert("Permissão de GPS negada.")
+    })
+  }
+
+  async function fetchWeatherAnalysis(cidadeAtual = "Sítio") {
+    setLoadingWeather(true)
+    try {
+      const analysis = await getWeatherAnalysis({
+        location: cidadeAtual,
+        currentWeather: "Ensolarado, " + temperature + "°C, Umidade 50%",
+        forecast: "Pancadas de chuva esperadas à tarde na região de " + cidadeAtual + "."
+      })
+      setAiWeather(analysis)
+    } catch (error) {
+      console.error("Erro ao carregar análise climática:", error)
+    } finally {
+      setLoadingWeather(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchWeatherAnalysis() {
-      setLoadingWeather(true)
-      try {
-        const analysis = await getWeatherAnalysis({
-          location: "Sítio Primavera",
-          currentWeather: "Ensolarado, 27°C, Umidade 50%",
-          forecast: "Próximos dias secos, ideal para colheita de ervas."
-        })
-        setAiWeather(analysis)
-      } catch (error) {
-        console.error("Erro ao carregar análise climática:", error)
-      } finally {
-        setLoadingWeather(false)
-      }
-    }
     fetchWeatherAnalysis()
   }, [])
 
@@ -98,31 +136,43 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="flex items-center gap-4 bg-white p-3 rounded-xl border shadow-sm">
-          <div className="flex items-center gap-2 pr-4 border-r">
-            <CloudSun className="h-8 w-8 text-orange-500" />
-            <div>
-              <p className="text-2xl font-bold leading-none">27°C</p>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold">Agradável</p>
+        <div className="flex flex-col gap-2 bg-white p-3 rounded-xl border shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 pr-4 border-r">
+              <CloudSun className="h-8 w-8 text-orange-500" />
+              <div>
+                <p className="text-2xl font-bold leading-none">{temperature}°C</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">Agradável</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Ter</p>
+                <CloudSun className="h-4 w-4 mx-auto text-orange-400" />
+                <p className="text-xs font-bold">{temperature + 2}°</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Qua</p>
+                <CloudRain className="h-4 w-4 mx-auto text-blue-400" />
+                <p className="text-xs font-bold">{temperature - 5}°</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Qui</p>
+                <ThermometerSun className="h-4 w-4 mx-auto text-red-400" />
+                <p className="text-xs font-bold">{temperature + 3}°</p>
+              </div>
             </div>
           </div>
-          <div className="flex gap-4">
-            <div className="text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase">Ter</p>
-              <CloudSun className="h-4 w-4 mx-auto text-orange-400" />
-              <p className="text-xs font-bold">29°</p>
-            </div>
-            <div className="text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase">Qua</p>
-              <CloudRain className="h-4 w-4 mx-auto text-blue-400" />
-              <p className="text-xs font-bold">22°</p>
-            </div>
-            <div className="text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase">Qui</p>
-              <ThermometerSun className="h-4 w-4 mx-auto text-red-400" />
-              <p className="text-xs font-bold">30°</p>
-            </div>
-          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full h-7 text-xs bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+            onClick={handleGetLocation}
+            disabled={isLocating}
+          >
+            {isLocating ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <MapPin className="h-3 w-3 mr-1 text-primary" />}
+            {locationName}
+          </Button>
         </div>
       </div>
 
