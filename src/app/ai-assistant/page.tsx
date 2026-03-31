@@ -7,13 +7,56 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BrainCircuit, Sprout, PawPrint, Loader2, Sparkles, CheckCircle2 } from "lucide-react"
+import { BrainCircuit, Sprout, PawPrint, Loader2, Sparkles, CheckCircle2, Mic } from "lucide-react"
 import { getLivestockManagementAdvice } from "@/ai/flows/livestock-management-advice"
 import { optimizedPlantingRecommendations } from "@/ai/flows/optimized-planting-recommendations"
 
 export default function AIAssistant() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
+  
+  // Estados para os inputs
+  const [soilType, setSoilType] = useState("")
+  const [weatherData, setWeatherData] = useState("")
+  const [species, setSpecies] = useState("")
+  const [age, setAge] = useState("")
+
+  // Estado para UX do gravador
+  const [listeningFor, setListeningFor] = useState<string | null>(null)
+
+  const handleListen = (inputId: string, setterFn: React.Dispatch<React.SetStateAction<string>>) => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert("Seu navegador não suporta reconhecimento de voz.")
+      return
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    
+    recognition.lang = 'pt-BR'
+    recognition.continuous = false
+    recognition.interimResults = false
+
+    recognition.onstart = () => {
+      setListeningFor(inputId)
+    }
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript
+      setterFn(prev => prev ? prev + ' ' + transcript : transcript)
+    }
+
+    recognition.onerror = (event: any) => {
+      console.error("Erro no reconhecimento de voz:", event.error)
+      setListeningFor(null)
+    }
+
+    recognition.onend = () => {
+      setListeningFor(null)
+    }
+
+    recognition.start()
+  }
 
   const handlePlantingRecommendation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -21,8 +64,8 @@ export default function AIAssistant() {
     const formData = new FormData(e.currentTarget)
     try {
       const res = await optimizedPlantingRecommendations({
-        soilType: formData.get("soilType") as string,
-        weatherData: formData.get("weatherData") as string,
+        soilType: soilType,
+        weatherData: weatherData,
       })
       setResult({ type: 'planting', data: res })
     } catch (err) {
@@ -38,8 +81,8 @@ export default function AIAssistant() {
     const formData = new FormData(e.currentTarget)
     try {
       const res = await getLivestockManagementAdvice({
-        species: formData.get("species") as string,
-        ageInMonths: parseInt(formData.get("age") as string),
+        species: species,
+        ageInMonths: parseInt(age),
       })
       setResult({ type: 'livestock', data: res })
     } catch (err) {
@@ -80,14 +123,45 @@ export default function AIAssistant() {
             <CardContent>
               <form onSubmit={handlePlantingRecommendation} className="space-y-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="soilType">Tipo de Solo</Label>
-                  <Input id="soilType" name="soilType" placeholder="Ex: Argiloso, Arenoso, Fértil..." required />
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="soilType">Tipo de Solo</Label>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className={`h-8 w-8 p-0 rounded-full ${listeningFor === 'soilType' ? 'text-red-500 animate-pulse bg-red-100' : 'text-muted-foreground'}`}
+                      onClick={() => handleListen('soilType', setSoilType)}
+                      title="Falar"
+                    >
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Input 
+                    id="soilType" 
+                    value={soilType}
+                    onChange={(e) => setSoilType(e.target.value)}
+                    placeholder="Ex: Argiloso, Arenoso, Fértil..." 
+                    required 
+                  />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="weatherData">Dados Meteorológicos / Condições Locais</Label>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="weatherData">Dados Meteorológicos / Condições Locais</Label>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      className={`h-8 w-8 p-0 rounded-full ${listeningFor === 'weatherData' ? 'text-red-500 animate-pulse bg-red-100' : 'text-muted-foreground'}`}
+                      onClick={() => handleListen('weatherData', setWeatherData)}
+                      title="Falar"
+                    >
+                      <Mic className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <Textarea 
                     id="weatherData" 
-                    name="weatherData" 
+                    value={weatherData}
+                    onChange={(e) => setWeatherData(e.target.value)}
                     placeholder="Ex: Clima temperado, chuvas regulares no verão, média 25°C..." 
                     className="min-h-[100px]"
                     required
@@ -112,12 +186,37 @@ export default function AIAssistant() {
               <form onSubmit={handleLivestockAdvice} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="species">Espécie</Label>
-                    <Input id="species" name="species" placeholder="Ex: Bovino (Corte)" required />
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="species">Espécie</Label>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        className={`h-8 w-8 p-0 rounded-full ${listeningFor === 'species' ? 'text-red-500 animate-pulse bg-red-100' : 'text-muted-foreground'}`}
+                        onClick={() => handleListen('species', setSpecies)}
+                        title="Falar"
+                      >
+                        <Mic className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Input 
+                      id="species" 
+                      value={species}
+                      onChange={(e) => setSpecies(e.target.value)}
+                      placeholder="Ex: Bovino (Corte)" 
+                      required 
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="age">Idade (Meses)</Label>
-                    <Input id="age" name="age" type="number" placeholder="Ex: 12" required />
+                    <Input 
+                      id="age" 
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      type="number" 
+                      placeholder="Ex: 12" 
+                      required 
+                    />
                   </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
