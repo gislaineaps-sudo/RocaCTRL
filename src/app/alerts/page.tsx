@@ -158,20 +158,20 @@ export default function AlertsPage() {
                      alert.priority === 'Alta' ? <AlertTriangle className="h-5 w-5" /> : 
                      <Clock className="h-5 w-5" />}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className={`font-bold ${alert.status === 'Concluído' ? 'line-through text-muted-foreground' : ''}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1 gap-2">
+                      <h4 className={`font-bold truncate ${alert.status === 'Concluído' ? 'line-through text-muted-foreground' : ''}`}>
                         {alert.title}
                       </h4>
-                      <Badge variant={alert.priority === 'Alta' ? 'destructive' : 'secondary'}>
+                      <Badge variant={alert.priority === 'Alta' ? 'destructive' : 'secondary'} className="flex-shrink-0">
                         {alert.priority}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
+                    <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground flex-wrap">
+                      <span className="flex items-center gap-1 shrink-0">
                         <CalendarIcon className="h-3 w-3" /> {alert.date}
                       </span>
-                      <span className="font-medium text-primary uppercase tracking-tight flex items-center gap-1">
+                      <span className="font-medium text-primary uppercase tracking-tight flex items-center gap-1 shrink-0">
                         {alert.category === "Infraestrutura" && <Hammer className="h-3 w-3" />}
                         {alert.category === "Podas" && <Scissors className="h-3 w-3" />}
                         {alert.category === "Adubação" && <Droplets className="h-3 w-3" />}
@@ -179,7 +179,7 @@ export default function AlertsPage() {
                       </span>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="shrink-0 group-hover:bg-background">
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
