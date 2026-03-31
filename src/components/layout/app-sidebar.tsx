@@ -35,7 +35,7 @@ const navigation = [
   { name: "Culturas", href: "/crops", icon: Sprout },
   { name: "Financeiro", href: "/financial", icon: Wallet },
   { name: "Categorias", href: "/categories", icon: Library },
-  { name: "Alertas", href: "/alerts", icon: Bell },
+  { name: "Tarefas e Alertas", href: "/alerts", icon: Bell },
   { name: "Monitoramento IoT", href: "/iot", icon: Cpu },
   { name: "Assistente IA", href: "/ai-assistant", icon: BrainCircuit },
 ]
