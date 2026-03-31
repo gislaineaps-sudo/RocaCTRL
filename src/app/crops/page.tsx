@@ -16,6 +16,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   Plus, 
   Search, 
@@ -194,6 +195,90 @@ export default function CropsPage() {
                   </div>
                 </div>
               </div>
+              
+              <div className="bg-muted/30 p-4 border-t w-full flex justify-end">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="text-xs h-8 bg-green-50 hover:bg-green-100 text-green-700 border-green-200">
+                      🌿 Insumos e Custos
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Manejo de Insumos: {crop.name}</DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="fertilizantes" className="w-full mt-2">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="fertilizantes">Fertilizantes</TabsTrigger>
+                        <TabsTrigger value="pesticidas">Pesticidas</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="fertilizantes" className="space-y-4 py-4">
+                        <div className="bg-green-50 border border-green-200 p-3 rounded-md flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-bold text-green-800">Custo com Fertilizantes</p>
+                            <p className="text-xs text-green-700">Acumulado na safra atual</p>
+                          </div>
+                          <p className="text-lg font-bold text-green-800">R$ 150,00</p>
+                        </div>
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-bold">Aplicações Recentes</h4>
+                          <div className="flex justify-between items-center text-sm border-b pb-2">
+                            <span>NPK 10-10-10 (2kg)</span>
+                            <span className="font-bold text-muted-foreground">15/02/2024</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm border-b pb-2">
+                            <span>Composto Orgânico (10kg)</span>
+                            <span className="font-bold text-muted-foreground">01/02/2024</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                           <h4 className="text-sm font-bold mb-3">Lançar Nova Aplicação</h4>
+                           <div className="grid gap-2">
+                              <Input placeholder="Tipo (ex: NPK, Ureia)" className="text-sm" />
+                              <div className="grid grid-cols-3 gap-2">
+                                <Input placeholder="Qtd" type="number" className="text-sm" />
+                                <Input type="date" className="text-sm" />
+                                <Input placeholder="R$ Custo" type="number" className="text-sm" />
+                              </div>
+                              <Button size="sm" className="w-full mt-2" variant="outline">Salvar e Enviar ao Financeiro</Button>
+                           </div>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="pesticidas" className="space-y-4 py-4">
+                        <div className="bg-red-50 border border-red-200 p-3 rounded-md flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-bold text-red-800">Custo com Defensivos</p>
+                            <p className="text-xs text-red-700">Acumulado na safra atual</p>
+                          </div>
+                          <p className="text-lg font-bold text-red-800">R$ 80,00</p>
+                        </div>
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-bold">Aplicações Recentes</h4>
+                          <div className="flex justify-between items-center text-sm border-b pb-2">
+                            <span>Óleo de Neem (500ml)</span>
+                            <span className="font-bold text-muted-foreground">22/02/2024</span>
+                          </div>
+                        </div>
+                        <div className="border-t pt-3">
+                           <h4 className="text-sm font-bold mb-3">Lançar Nova Aplicação</h4>
+                           <div className="grid gap-2">
+                              <Input placeholder="Tipo (ex: Óleo de Neem)" className="text-sm" />
+                              <div className="grid grid-cols-3 gap-2">
+                                <Input placeholder="Qtd" type="number" className="text-sm" />
+                                <Input type="date" className="text-sm" />
+                                <Input placeholder="R$ Custo" type="number" className="text-sm" />
+                              </div>
+                              <Button size="sm" className="w-full mt-2" variant="outline">Salvar e Enviar ao Financeiro</Button>
+                           </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
             </div>
           </Card>
         ))}

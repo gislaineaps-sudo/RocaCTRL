@@ -10,7 +10,8 @@ import {
   Settings,
   HelpCircle,
   Library,
-  Cpu
+  Cpu,
+  Wallet
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -32,6 +33,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Animais", href: "/animals", icon: PawPrint },
   { name: "Culturas", href: "/crops", icon: Sprout },
+  { name: "Financeiro", href: "/financial", icon: Wallet },
   { name: "Categorias", href: "/categories", icon: Library },
   { name: "Alertas", href: "/alerts", icon: Bell },
   { name: "Monitoramento IoT", href: "/iot", icon: Cpu },

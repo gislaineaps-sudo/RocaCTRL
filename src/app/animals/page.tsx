@@ -30,6 +30,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -265,6 +266,90 @@ export default function AnimalsPage() {
                   <span className="text-xs font-bold">{animal.status}</span>
                 </div>
                 <span className="text-[10px] text-muted-foreground italic">Visto: {animal.lastCheck}</span>
+              </div>
+              
+              <div className="pt-2 flex gap-2 w-full">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full text-xs h-8 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200">
+                      💉 Vacinas
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Módulo de Saúde: {animal.name}</DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="vacinas" className="w-full mt-2">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="vacinas">Vacinação</TabsTrigger>
+                        <TabsTrigger value="racao">Alimentação</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="vacinas" className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-bold">Histórico Recente e Alertas</h4>
+                          <div className="bg-green-50  border border-green-200 p-3 rounded-md flex justify-between items-center">
+                            <div>
+                              <p className="text-sm font-bold text-green-800">Coccidiose (Múltipla)</p>
+                              <p className="text-xs text-green-700">Aplicada: 10/01/2024</p>
+                            </div>
+                            <Badge className="bg-green-500">Em dia</Badge>
+                          </div>
+                          <div className="bg-red-50 border border-red-200 p-3 rounded-md flex justify-between items-center">
+                            <div>
+                              <p className="text-sm font-bold text-red-800">Newcastle + Bronquite</p>
+                              <p className="text-xs text-red-700">Vencimento: Ontem</p>
+                            </div>
+                            <Badge variant="destructive" className="animate-pulse">Atrasada</Badge>
+                          </div>
+                        </div>
+
+                        <div className="border-t pt-4">
+                          <h4 className="text-sm font-bold mb-3">Registrar Nova Aplicação</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <Input placeholder="Nome da Vacina..." className="text-sm" />
+                            <Input type="date" className="text-sm" />
+                            <Input type="date" placeholder="Próxima dose" className="text-sm" />
+                            <Button size="sm" className="w-full">Registrar</Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="racao" className="space-y-4 py-4">
+                        <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-bold text-yellow-800">Custo Total Acumulado</p>
+                            <p className="text-xs text-yellow-700">Manejo {animal.name}</p>
+                          </div>
+                          <p className="text-lg font-bold text-yellow-800">R$ 480,00</p>
+                        </div>
+
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-bold">Últimos Lançamentos (Custos)</h4>
+                          <div className="flex justify-between items-center text-sm border-b pb-2">
+                            <span>Ração Inicial (30kg) - 1id/dia</span>
+                            <span className="font-bold text-muted-foreground">R$ 120,00</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm border-b pb-2">
+                            <span>Ração Crescimento (50kg)</span>
+                            <span className="font-bold text-muted-foreground">R$ 200,00</span>
+                          </div>
+                        </div>
+
+                        <div className="border-t pt-3">
+                           <h4 className="text-sm font-bold mb-3">Lançar Compra / Consumo</h4>
+                           <div className="grid gap-2">
+                              <Input placeholder="Tipo (ex: Ração Engorda)" className="text-sm" />
+                              <div className="grid grid-cols-2 gap-2">
+                                <Input placeholder="Qtd (kg)" type="number" className="text-sm" />
+                                <Input placeholder="Valor R$" type="number" className="text-sm" />
+                              </div>
+                              <Button size="sm" className="w-full mt-2" variant="outline">Adicionar Custo ao Financeiro</Button>
+                           </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
