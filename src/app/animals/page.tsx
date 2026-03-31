@@ -50,13 +50,41 @@ const initialAnimals = [
 ]
 
 export default function AnimalsPage() {
-  const [animals] = useState(initialAnimals)
+  const [animals, setAnimals] = useState(initialAnimals)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   
-  // Form state for dependencies
+  // Form state
+  const [newName, setNewName] = useState("")
   const [newAnimalCategory, setNewAnimalCategory] = useState<string>("")
   const [newAnimalSpecies, setNewAnimalSpecies] = useState<string>("")
+  const [newAge, setNewAge] = useState("")
+
+  const handleSave = () => {
+    if (!newName || !newAnimalCategory || !newAnimalSpecies || !newAge) return
+    
+    const newId = `${newAnimalCategory.substring(0,3).toUpperCase()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
+    
+    const newAnimal = {
+      id: newId,
+      name: newName,
+      category: newAnimalCategory,
+      species: newAnimalSpecies,
+      age: parseInt(newAge),
+      status: "Saudável",
+      lastCheck: new Date().toISOString().split('T')[0]
+    }
+    
+    setAnimals([newAnimal, ...animals])
+    setIsDialogOpen(false)
+    
+    // Reset form
+    setNewName("")
+    setNewAnimalCategory("")
+    setNewAnimalSpecies("")
+    setNewAge("")
+  }
 
   const filteredAnimals = useMemo(() => {
     return animals.filter(a => {
@@ -77,7 +105,7 @@ export default function AnimalsPage() {
           <h1 className="text-3xl font-headline font-bold text-primary">Gestão de Animais</h1>
           <p className="text-muted-foreground">Cadastre e acompanhe a saúde das suas criações por categoria.</p>
         </div>
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90">
               <Plus className="h-4 w-4 mr-2" /> Novo Registro
@@ -90,15 +118,23 @@ export default function AnimalsPage() {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">ID/Nome</Label>
-                <Input id="name" className="col-span-3" placeholder="Ex: Mimosa ou Lote 01" />
+                <Input 
+                  id="name" 
+                  className="col-span-3" 
+                  placeholder="Ex: Mimosa ou Lote 01" 
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
               </div>
               
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">Categoria</Label>
                 <div className="col-span-3">
-                  <Select onValueChange={(val) => {
-                    setNewAnimalCategory(val)
-                    setNewAnimalSpecies("") 
+                  <Select 
+                    value={newAnimalCategory}
+                    onValueChange={(val) => {
+                      setNewAnimalCategory(val)
+                      setNewAnimalSpecies("") 
                   }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione a Categoria" />
@@ -134,11 +170,18 @@ export default function AnimalsPage() {
 
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="age" className="text-right">Idade (Meses)</Label>
-                <Input id="age" type="number" className="col-span-3" placeholder="Ex: 12" />
+                <Input 
+                  id="age" 
+                  type="number" 
+                  className="col-span-3" 
+                  placeholder="Ex: 12" 
+                  value={newAge}
+                  onChange={(e) => setNewAge(e.target.value)}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Salvar Registro</Button>
+              <Button type="button" onClick={handleSave}>Salvar Registro</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -38,6 +38,7 @@ import {
 } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
 import { getWeatherAnalysis, type WeatherAnalysisOutput } from "@/ai/flows/weather-analysis"
+import { IoTControlPanel } from "@/components/iot-control"
 
 const animalData = [
   { name: "Galinhas", value: 60 },
@@ -271,20 +272,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline text-lg">Endpoints de Integração</CardTitle>
-            <CardDescription>Uso de APIs para automação externa</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-3 bg-muted rounded-md font-mono text-xs overflow-x-auto">
-              GET /api/stats
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Este endpoint fornece o status atual do sítio em formato JSON, permitindo que você conecte o RoçaCtrl com assistentes virtuais ou planilhas externas.
-            </p>
-          </CardContent>
-        </Card>
+        <IoTControlPanel />
       </div>
     </div>
   )

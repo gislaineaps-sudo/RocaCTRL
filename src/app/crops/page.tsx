@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { 
   Plus, 
   Search, 
@@ -26,7 +36,32 @@ const initialCrops = [
 ]
 
 export default function CropsPage() {
-  const [crops] = useState(initialCrops)
+  const [crops, setCrops] = useState(initialCrops)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  
+  // Form State
+  const [newName, setNewName] = useState("")
+  const [newType, setNewType] = useState("")
+  const [newArea, setNewArea] = useState("")
+
+  const handleSave = () => {
+    if (!newName || !newType || !newArea) return
+    const newCrop = {
+      id: Date.now(),
+      name: newName,
+      type: newType,
+      stage: "Plantio Inicial",
+      progress: 0,
+      area: newArea,
+      plantedDate: new Date().toISOString().split('T')[0],
+      health: "Observação"
+    }
+    setCrops([newCrop, ...crops])
+    setIsDialogOpen(false)
+    setNewName("")
+    setNewType("")
+    setNewArea("")
+  }
 
   return (
     <div className="space-y-6">
@@ -39,9 +74,58 @@ export default function CropsPage() {
           <Button variant="outline">
             <History className="h-4 w-4 mr-2" /> Histórico
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Plus className="h-4 w-4 mr-2" /> Novo Cultivo
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary hover:bg-primary/90">
+                <Plus className="h-4 w-4 mr-2" /> Novo Cultivo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Cadastrar Novo Cultivo</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">Nome</Label>
+                  <Input 
+                    id="name" 
+                    className="col-span-3" 
+                    placeholder="Ex: Canteiro de Rúcula" 
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">Tipo</Label>
+                  <div className="col-span-3">
+                    <Select value={newType} onValueChange={setNewType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione Categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Horta">Horta</SelectItem>
+                        <SelectItem value="Pomar">Pomar</SelectItem>
+                        <SelectItem value="Ervas">Ervas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="area" className="text-right">Tamanho</Label>
+                  <Input 
+                    id="area" 
+                    className="col-span-3" 
+                    placeholder="Ex: 5 m² ou 10 árvores" 
+                    value={newArea}
+                    onChange={(e) => setNewArea(e.target.value)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" onClick={handleSave}>Salvar Registro</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
