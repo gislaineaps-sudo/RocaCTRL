@@ -46,6 +46,7 @@ const CATEGORIES_DATA: Record<string, string[]> = {
   "Ranicultura": ["Rã-touro"],
   "Sericicultura": ["Bicho-da-seda"],
   "Canil / Cães de Trabalho": ["Cão Pastor", "Cão de Guarda", "Cão Cingueiro"],
+  "Pets / Animais Domésticos": ["Cachorro (Companhia)", "Gato", "Pássaro Doméstico"],
   "Outro (Personalizado)": ["Adicionar Manualmente..."]
 }
 
