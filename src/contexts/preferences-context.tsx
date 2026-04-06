@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react"
+"use client"
 
+import React, { createContext, useContext, useEffect, useState } from "react"
 export type ModuleId = 
   | "animals"
   | "crops"
