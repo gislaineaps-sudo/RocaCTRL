@@ -41,6 +41,7 @@ import {
 import { ChartContainer } from "@/components/ui/chart"
 import { getWeatherAnalysis, type WeatherAnalysisOutput } from "@/ai/flows/weather-analysis"
 import { IoTControlPanel } from "@/components/iot-control"
+import { AccessibilityPopover } from "@/components/accessibility-popover"
 
 const animalData = [
   { name: "Galinhas", value: 60 },
@@ -133,6 +134,9 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
             <p className="text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
+            <div className="mt-2">
+              <AccessibilityPopover />
+            </div>
           </div>
         </div>
         

@@ -4,6 +4,7 @@ import {SidebarProvider} from '@/components/ui/sidebar';
 import {AppSidebar} from '@/components/layout/app-sidebar';
 import {Toaster} from '@/components/ui/toaster';
 import {AccessibilityProvider} from '@/contexts/accessibility-context';
+import {PreferencesProvider} from '@/contexts/preferences-context';
 
 export const metadata: Metadata = {
   title: 'RoçaCtrl - Gestão de Sítios e Agricultura Familiar',
@@ -24,15 +25,17 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AccessibilityProvider>
-          <SidebarProvider>
-            <div className="flex min-h-screen w-full">
-              <AppSidebar />
-              <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
-                {children}
-              </main>
-            </div>
-          </SidebarProvider>
-          <Toaster />
+          <PreferencesProvider>
+            <SidebarProvider>
+              <div className="flex min-h-screen w-full">
+                <AppSidebar />
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
+                  {children}
+                </main>
+              </div>
+            </SidebarProvider>
+            <Toaster />
+          </PreferencesProvider>
         </AccessibilityProvider>
       </body>
     </html>

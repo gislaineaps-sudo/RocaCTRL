@@ -30,25 +30,33 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { useAccessibility } from "@/contexts/accessibility-context"
+import { usePreferences, ModuleId } from "@/contexts/preferences-context"
 
-const navigation = [
+type NavItem = {
+  name: string
+  href: string
+  icon: React.ElementType
+  id?: ModuleId
+}
+
+const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Animais", href: "/animals", icon: PawPrint },
-  { name: "Culturas", href: "/crops", icon: Sprout },
-  { name: "Financeiro", href: "/financial", icon: Wallet },
-  { name: "Categorias", href: "/categories", icon: Library },
-  { name: "Tarefas e Alertas", href: "/alerts", icon: Bell },
-  { name: "Monitoramento IoT", href: "/iot", icon: Cpu },
-  { name: "Assistente IA", href: "/ai-assistant", icon: BrainCircuit },
+  { name: "Animais", href: "/animals", icon: PawPrint, id: "animals" },
+  { name: "Culturas", href: "/crops", icon: Sprout, id: "crops" },
+  { name: "Financeiro", href: "/financial", icon: Wallet, id: "financial" },
+  { name: "Categorias", href: "/categories", icon: Library, id: "categories" },
+  { name: "Tarefas e Alertas", href: "/alerts", icon: Bell, id: "alerts" },
+  { name: "Monitoramento IoT", href: "/iot", icon: Cpu, id: "iot" },
+  { name: "Assistente IA", href: "/ai-assistant", icon: BrainCircuit, id: "ai-assistant" },
 ]
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { state } = useSidebar()
-  const { isHighContrast, toggleHighContrast, increaseFontSize, decreaseFontSize } = useAccessibility()
+  const { modules } = usePreferences()
   const logoImage = PlaceHolderImages.find(img => img.id === "app-logo")
+
+  const visibleNavigation = navigation.filter(item => !item.id || modules[item.id])
 
   return (
     <Sidebar collapsible="icon">
@@ -72,7 +80,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent className="py-4">
         <SidebarMenu>
-          {navigation.map((item) => (
+          {visibleNavigation.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 asChild
@@ -91,26 +99,11 @@ export function AppSidebar() {
       <SidebarFooter className="border-t py-4">
         <SidebarMenu className="space-y-1">
           <SidebarMenuItem>
-            <div className="flex w-full items-center gap-2 px-2 py-1.5">
-              <Button variant="outline" size="icon" className="h-8 flex-1" onClick={decreaseFontSize} title="Diminuir Letra">
-                <Type className="h-3 w-3" />-
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 flex-1" onClick={increaseFontSize} title="Aumentar Letra">
-                <Type className="h-4 w-4" />+
-              </Button>
-            </div>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Alto Contraste" onClick={toggleHighContrast} isActive={isHighContrast}>
-              <Contrast />
-              <span>Alto Contraste</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <div className="my-2 h-px bg-border" />
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Configurações">
-              <Settings />
-              <span>Configurações</span>
+            <SidebarMenuButton tooltip="Configurações" asChild isActive={pathname === "/settings"}>
+              <Link href="/settings">
+                <Settings />
+                <span>Configurações</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
