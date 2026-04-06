@@ -3,6 +3,16 @@
 import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { 
   Table, 
   TableBody, 
@@ -12,25 +22,68 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Search, Info, Bird, Fish, HelpCircle, Beef, FlaskConical, Leaf, Cherry, Sprout } from "lucide-react"
+import { 
+  Plus,
+  Search, 
+  Info, 
+  Bird, 
+  Beef, 
+  FlaskConical, 
+  Leaf, 
+  Cherry, 
+  Sprout,
+  Trees,
+  Star
+} from "lucide-react"
 
-const categories = [
-  { id: 1, name: "Horta de Vegetais", species: "Alface, Tomate Cereja, Cenoura, Pimentão, Couve", products: "Consumo Próprio, Venda Local, Feiras", icon: Sprout },
+const initialCategories = [
+  { id: 1, name: "Hortaliças (Verduras/Legumes)", species: "Alface, Tomate Cereja, Cenoura, Pimentão, Couve", products: "Consumo Próprio, Venda Local, Feiras", icon: Sprout },
   { id: 2, name: "Pomar (Frutíferas)", species: "Limão, Jabuticaba, Amora, Banana, Mamão", products: "Frutas Frescas, Geleias, Sucos", icon: Cherry },
-  { id: 3, name: "Ervas e Temperos", species: "Manjericão, Alecrim, Hortelã, Salsinha, Cebolinha", products: "Temperos Frescos, Chás, Óleos Essenciais", icon: Leaf },
+  { id: 3, name: "Ervas Medicinais / Temperos", species: "Manjericão, Alecrim, Hortelã, Salsinha, Cebolinha", products: "Temperos Frescos, Chás, Óleos Essenciais", icon: Leaf },
   { id: 4, name: "Avicultura Familiar", species: "Galinha Caipira (Postura e Corte), Codorna", products: "Ovos Caipiras, Carne, Esterco para Horta", icon: Bird },
   { id: 5, name: "Apicultura / Meliponicultura", species: "Abelha Jataí, Mandaçaia, Europa", products: "Mel, Polinização da Horta, Própolis", icon: FlaskConical },
   { id: 6, name: "Pequenos Ruminantes", species: "Cabra Saanen (Leite), Ovelha Santa Inês", products: "Leite Artesanal, Queijos, Lã", icon: Beef },
+  { id: 7, name: "Fungicultura (Cogumelos)", species: "Shitake, Shimeji, Champignon", products: "Consumo Próprio, Venda Especializada", icon: Leaf },
+  { id: 8, name: "Cereais / Grãos (Milho/Soja)", species: "Milho, Soja, Arroz, Feijão", products: "Grãos de Consumo, Ração Animal", icon: Sprout },
+  { id: 9, name: "Raízes / Tubérculos (Mandioca)", species: "Mandioca, Batata Doce, Inhame", products: "Farinhas, Consumo Fresco", icon: Sprout },
+  { id: 10, name: "Floricultura (Flores)", species: "Orquídeas, Rosas, Girassóis", products: "Ornamentação, Eventos", icon: Star },
+  { id: 11, name: "Silvicultura (Madeira/Eucalipto)", species: "Eucalipto, Pinus, Cedro", products: "Madeira, Lenha, Manejo Florestal", icon: Trees },
 ]
 
 export default function CategoriesPage() {
+  const [categories, setCategories] = useState(initialCategories)
   const [searchTerm, setSearchTerm] = useState("")
+  
+  // Dialog State
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [newName, setNewName] = useState("")
+  const [newSpecies, setNewSpecies] = useState("")
+  const [newProducts, setNewProducts] = useState("")
 
   const filtered = categories.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.products.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const handleSave = () => {
+    if (!newName) return
+    
+    // Create new array to preserve existing functionality with new item
+    const newCategory = {
+      id: Date.now(),
+      name: newName,
+      species: newSpecies || "Não informado",
+      products: newProducts || "Não informado",
+      icon: Star
+    }
+
+    setCategories([newCategory, ...categories])
+    setIsDialogOpen(false)
+    setNewName("")
+    setNewSpecies("")
+    setNewProducts("")
+  }
 
   return (
     <div className="space-y-6">
@@ -39,6 +92,54 @@ export default function CategoriesPage() {
           <h1 className="text-3xl font-headline font-bold text-primary">Guia de Diversificação</h1>
           <p className="text-muted-foreground">Foco em Agricultura Familiar e Produção de Pequena Escala.</p>
         </div>
+        
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 min-w-40">
+              <Plus className="h-4 w-4 mr-2" /> Nova Categoria
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Incluir Manualmente</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">Nome</Label>
+                <Input 
+                  id="name" 
+                  className="col-span-3" 
+                  placeholder="Ex: Minhocultura" 
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="species" className="text-right">Cultivos</Label>
+                <Input 
+                  id="species" 
+                  className="col-span-3" 
+                  placeholder="Ex: Minhoca Californiana" 
+                  value={newSpecies}
+                  onChange={(e) => setNewSpecies(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="products" className="text-right">Produtos</Label>
+                <Input 
+                  id="products" 
+                  className="col-span-3" 
+                  placeholder="Ex: Húmus, Isca Viva" 
+                  value={newProducts}
+                  onChange={(e) => setNewProducts(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" onClick={handleSave}>Salvar Registro</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>
@@ -60,7 +161,7 @@ export default function CategoriesPage() {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="w-[200px] font-bold">Categoria</TableHead>
+                  <TableHead className="w-[250px] font-bold">Categoria</TableHead>
                   <TableHead className="font-bold">Cultivos / Espécies</TableHead>
                   <TableHead className="font-bold">Finalidade / Produtos</TableHead>
                 </TableRow>
@@ -71,7 +172,7 @@ export default function CategoriesPage() {
                     <TableRow key={cat.id} className="hover:bg-muted/30">
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                          <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                             <cat.icon className="h-4 w-4" />
                           </div>
                           <span>{cat.name}</span>
@@ -82,9 +183,9 @@ export default function CategoriesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {cat.products.split(", ").map((prod, i) => (
+                          {cat.products.split(",").map((prod, i) => (
                             <Badge key={i} variant="secondary" className="bg-accent/10 text-primary border-none text-[10px]">
-                              {prod}
+                              {prod.trim()}
                             </Badge>
                           ))}
                         </div>
