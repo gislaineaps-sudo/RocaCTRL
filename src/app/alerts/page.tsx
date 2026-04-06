@@ -17,17 +17,18 @@ import {
   Filter,
   Hammer,
   Scissors,
-  Droplets
+  Droplets,
+  RefreshCcw
 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 
 const initialAlerts = [
-  { id: 1, title: "Vacinação Febre Aftosa", priority: "Alta", category: "Saúde Animal", date: "2024-02-28", status: "Pendente", icon: Bell },
-  { id: 2, title: "Adubação Cobertura Milho", priority: "Média", category: "Adubação", date: "2024-03-02", status: "Aguardando", icon: Droplets },
-  { id: 3, title: "Revisão Trator John Deere", priority: "Baixa", category: "Manutenção", date: "2024-03-05", status: "Pendente", icon: Hammer },
-  { id: 4, title: "Troca de Pasto Lote B", priority: "Média", category: "Manejo", date: "2024-03-01", status: "Concluído", icon: CheckCircle2 },
-  { id: 5, title: "Reparo de Cerca Divisa Sul", priority: "Alta", category: "Infraestrutura", date: "2024-03-04", status: "Pendente", icon: Hammer },
-  { id: 6, title: "Poda de Limpeza Pomar", priority: "Baixa", category: "Podas", date: "2024-03-10", status: "Aguardando", icon: Scissors },
+  { id: 1, title: "Vacinação Febre Aftosa", priority: "Alta", category: "Saúde Animal", date: "2024-02-28", status: "Pendente", icon: Bell, recurrence: "Nenhuma" },
+  { id: 2, title: "Adubação Cobertura Milho", priority: "Média", category: "Adubação", date: "2024-03-02", status: "Aguardando", icon: Droplets, recurrence: "Semanal" },
+  { id: 3, title: "Revisão Trator John Deere", priority: "Baixa", category: "Manutenção", date: "2024-03-05", status: "Pendente", icon: Hammer, recurrence: "Mensal" },
+  { id: 4, title: "Troca de Pasto Lote B", priority: "Média", category: "Manejo", date: "2024-03-01", status: "Concluído", icon: CheckCircle2, recurrence: "Nenhuma" },
+  { id: 5, title: "Reparo de Cerca Divisa Sul", priority: "Alta", category: "Infraestrutura", date: "2024-03-04", status: "Pendente", icon: Hammer, recurrence: "Nenhuma" },
+  { id: 6, title: "Poda de Limpeza Pomar", priority: "Baixa", category: "Podas", date: "2024-03-10", status: "Aguardando", icon: Scissors, recurrence: "Anual" },
 ]
 
 export default function AlertsPage() {
@@ -38,6 +39,7 @@ export default function AlertsPage() {
   const [newTaskDate, setNewTaskDate] = useState("")
   const [newTaskPriority, setNewTaskPriority] = useState("")
   const [newTaskCategory, setNewTaskCategory] = useState("")
+  const [newTaskRecurrence, setNewTaskRecurrence] = useState("Nenhuma")
 
   useEffect(() => {
     setDate(new Date())
@@ -53,12 +55,14 @@ export default function AlertsPage() {
       date: newTaskDate || (date ? date.toISOString().split("T")[0] : new Date().toISOString().split("T")[0]),
       status: "Pendente",
       icon: Bell,
+      recurrence: newTaskRecurrence,
     }
     setTasks([newTask, ...tasks])
     setNewTaskTitle("")
     setNewTaskDate("")
     setNewTaskPriority("")
     setNewTaskCategory("")
+    setNewTaskRecurrence("Nenhuma")
   }
 
   return (
@@ -127,6 +131,18 @@ export default function AlertsPage() {
                     <SelectItem value="Geral">Geral</SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="col-span-2">
+                  <Select value={newTaskRecurrence} onValueChange={setNewTaskRecurrence}>
+                    <SelectTrigger><SelectValue placeholder="Recorrência" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Nenhuma">Nenhuma (Apenas 1 vez)</SelectItem>
+                      <SelectItem value="Diária">Diária</SelectItem>
+                      <SelectItem value="Semanal">Semanal</SelectItem>
+                      <SelectItem value="Mensal">Mensal</SelectItem>
+                      <SelectItem value="Anual">Anual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleAddTask}>
                 Adicionar Tarefa
@@ -163,9 +179,17 @@ export default function AlertsPage() {
                       <h4 className={`font-bold truncate ${alert.status === 'Concluído' ? 'line-through text-muted-foreground' : ''}`}>
                         {alert.title}
                       </h4>
-                      <Badge variant={alert.priority === 'Alta' ? 'destructive' : 'secondary'} className="flex-shrink-0">
-                        {alert.priority}
-                      </Badge>
+                      <div className="flex gap-2">
+                        {alert.recurrence && alert.recurrence !== 'Nenhuma' && (
+                          <Badge variant="outline" className="flex-shrink-0 bg-blue-50 text-blue-700 border-blue-200">
+                            <RefreshCcw className="h-3 w-3 mr-1" />
+                            {alert.recurrence}
+                          </Badge>
+                        )}
+                        <Badge variant={alert.priority === 'Alta' ? 'destructive' : 'secondary'} className="flex-shrink-0">
+                          {alert.priority}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground flex-wrap">
                       <span className="flex items-center gap-1 shrink-0">
