@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import {SidebarProvider} from '@/components/ui/sidebar';
+import {SidebarProvider, SidebarTrigger} from '@/components/ui/sidebar';
 import {AppSidebar} from '@/components/layout/app-sidebar';
 import {Toaster} from '@/components/ui/toaster';
 import {AccessibilityProvider} from '@/contexts/accessibility-context';
@@ -29,8 +29,14 @@ export default function RootLayout({
             <SidebarProvider>
               <div className="flex min-h-screen w-full">
                 <AppSidebar />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background p-4 md:p-8">
-                  {children}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-background flex flex-col">
+                  <header className="flex h-14 md:hidden items-center border-b px-4 shrink-0 bg-white">
+                    <SidebarTrigger className="-ml-1 text-primary focus:ring-primary" />
+                    <span className="font-headline font-bold text-lg text-primary ml-3">RoçaCtrl</span>
+                  </header>
+                  <div className="p-4 md:p-8 flex-1">
+                    {children}
+                  </div>
                 </main>
               </div>
             </SidebarProvider>

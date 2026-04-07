@@ -122,19 +122,19 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
           <Image 
-            src="/logo.jpg" 
+            src="/Logo lateral.png" 
             alt="Logo RoçaCTRL" 
             width={140} 
             height={140} 
-            className="rounded-full shadow-lg object-cover border-4 border-primary/20 aspect-square"
+            className="w-24 h-24 md:w-36 md:h-36 rounded-full shadow-lg object-cover border-4 border-primary/20 aspect-square shrink-0"
           />
-          <div>
-            <h1 className="text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
-            <p className="text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
-            <div className="mt-2">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
+            <div className="mt-4 flex justify-center md:justify-start">
               <AccessibilityPopover />
             </div>
           </div>

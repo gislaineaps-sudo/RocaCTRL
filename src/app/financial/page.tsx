@@ -25,6 +25,7 @@ import {
   DollarSign,
   PieChart as PieChartIcon,
   Download,
+  Upload,
   Sprout,
   PawPrint
 } from "lucide-react"
@@ -58,11 +59,15 @@ export default function FinancialPage() {
           </h1>
           <p className="text-muted-foreground">Controle de lucros, custos de manejo e projeção de receita.</p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Download className="h-4 w-4" /> Exportar Relatório
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Upload className="h-4 w-4 text-muted-foreground" /> Importar Dados
+          </Button>
+          <Button variant="default" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
+            <Download className="h-4 w-4" /> Exportar Relatório
+          </Button>
+        </div>
       </div>
-
       {/* KPIs Principais */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

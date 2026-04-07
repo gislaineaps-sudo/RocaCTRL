@@ -61,13 +61,13 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b px-4 py-4">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/20 bg-primary/10">
+        <Link href="/" className="flex items-center gap-2 overflow-hidden hover:opacity-80 transition-opacity">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-primary/20 bg-primary/10">
             <Image 
-              src="/logo.jpg" 
+              src="/Logo lateral.png" 
               alt="Logo RoçaCtrl" 
-              width={32} 
-              height={32} 
+              width={40} 
+              height={40} 
               className="object-cover h-full w-full scale-[1.3]"
             />
           </div>
@@ -76,7 +76,7 @@ export function AppSidebar() {
               RoçaCtrl
             </span>
           )}
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent className="py-4">
         <SidebarMenu>

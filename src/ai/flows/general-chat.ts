@@ -11,7 +11,6 @@ const GeneralChatInputSchema = z.object({
 const prompt = ai.definePrompt({
   name: 'generalChatPrompt',
   input: {schema: GeneralChatInputSchema},
-  output: {schema: z.string()},
   prompt: `Você é um consultor agrônomo amigável da ferramenta RoçaCtrl, focado em agricultura familiar, hortas, pequenos rebanhos e clima.
 Seja conselheiro, prestativo e forneça boas práticas do campo baseadas nas perguntas do usuário.
 Responda sempre utilizando Markdown quando for utilizar listas ou grifar elementos importantes.
@@ -32,8 +31,8 @@ const generalChatFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const {text} = await prompt(input);
+    return text;
   }
 );
 
