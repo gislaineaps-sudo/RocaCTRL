@@ -303,18 +303,16 @@ export default function Dashboard() {
                     "{aiWeather.advice}"
                   </p>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Ações Prioritárias</p>
-                    <ul className="space-y-1">
-                      {aiWeather.priorityTasks.map((task, i) => (
-                        <li key={i} className="text-xs flex items-center gap-2 font-medium">
-                          <div className="h-1 w-1 rounded-full bg-primary" />
-                          {task}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="space-y-3 pt-2">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Ações Prioritárias</p>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    {aiWeather.priorityTasks.map((task, i) => (
+                      <li key={i} className="text-xs flex items-start gap-2 font-medium">
+                        <div className="h-1.5 w-1.5 min-w-[6px] rounded-full bg-primary shrink-0 mt-1" />
+                        <span className="leading-snug text-muted-foreground">{task}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ) : (
