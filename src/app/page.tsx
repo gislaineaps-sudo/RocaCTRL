@@ -125,11 +125,11 @@ export default function Dashboard() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
           <Image 
-            src="/Logo lateral.png" 
+            src="/logo.jpg" 
             alt="Logo RoçaCTRL" 
             width={140} 
             height={140} 
-            className="w-24 h-24 md:w-36 md:h-36 rounded-full shadow-lg object-cover border-4 border-primary/20 aspect-square shrink-0"
+            className="w-24 h-24 md:w-36 md:h-36 rounded-full shadow-lg object-cover object-center border-4 border-primary/20 aspect-square shrink-0 bg-white"
           />
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
