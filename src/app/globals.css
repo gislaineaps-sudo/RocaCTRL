@@ -63,60 +63,6 @@
     --ring: 102 60% 45%;
   }
 
-  :root.high-contrast {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 20%;
-    --accent: 0 0% 0%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 0% 0%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 0%;
-    --input: 0 0% 40%;
-    --ring: 0 0% 0%;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 0 0% 0%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 90%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: 0 0% 0%;
-  }
-
-  /* Força a remoção de cores explícitas no alto contraste para dar efeito visual */
-  :root.high-contrast .bg-white {
-    background-color: transparent !important;
-  }
-  :root.high-contrast .text-primary {
-    color: hsl(var(--primary)) !important;
-  }
-  :root.high-contrast .bg-primary {
-    background-color: hsl(var(--primary)) !important;
-  }
-  :root.high-contrast .text-muted-foreground {
-    color: hsl(var(--foreground)) !important;
-  }
-
-  :root.font-scale-large {
-    font-size: 110% !important;
-  }
-
-  :root.font-scale-x-large {
-    font-size: 125% !important;
-  }
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -127,4 +73,62 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
   }
+}
+
+/* REGRAS DE ACESSIBILIDADE BLINDADAS (FORA DO TAILWIND LAYER) */
+
+html.high-contrast {
+  --background: 0 0% 0% !important; /* Preto */
+  --foreground: 0 0% 100% !important; /* Branco */
+  --card: 0 0% 0% !important;
+  --card-foreground: 0 0% 100% !important;
+  --popover: 0 0% 0% !important;
+  --popover-foreground: 0 0% 100% !important;
+  --primary: 60 100% 50% !important; /* Amarelo stark */
+  --primary-foreground: 0 0% 0% !important;
+  --muted: 0 0% 15% !important;
+  --muted-foreground: 0 0% 100% !important;
+  --border: 0 0% 100% !important;
+  --sidebar-background: 0 0% 0% !important;
+  --sidebar-foreground: 0 0% 100% !important;
+}
+
+/* Subscribing hardcore colors for hardcoded tailwind items */
+html.high-contrast body,
+html.high-contrast main,
+html.high-contrast .bg-white,
+html.high-contrast .bg-card,
+html.high-contrast .bg-primary\/5,
+html.high-contrast .bg-primary\/10 {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+html.high-contrast * {
+  border-color: #fff !important;
+}
+
+html.high-contrast .text-primary,
+html.high-contrast .text-muted-foreground,
+html.high-contrast .text-blue-400,
+html.high-contrast .text-blue-500,
+html.high-contrast .text-red-400,
+html.high-contrast .text-orange-400,
+html.high-contrast .text-orange-500,
+html.high-contrast .text-green-500,
+html.high-contrast svg {
+  color: #ffff00 !important; /* Letras amarelas */
+}
+
+html.high-contrast .bg-primary {
+  background-color: #ffff00 !important;
+}
+
+/* Aumento de Fonte Blindado */
+html.font-scale-large {
+  font-size: 20px !important;
+}
+
+html.font-scale-x-large {
+  font-size: 24px !important;
 }
