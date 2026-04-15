@@ -37,5 +37,10 @@ const generalChatFlow = ai.defineFlow(
 );
 
 export async function submitGeneralChat(message: string, historyText: string = ""): Promise<string> {
-  return generalChatFlow({ message, historyText });
+  try {
+    return await generalChatFlow({ message, historyText });
+  } catch (error: any) {
+    console.error("Vercel Chat Error:", error);
+    return `Desculpe, ocorreu um erro técnico ao comunicar com a IA: ${error?.message || "Erro Desconhecido"}`;
+  }
 }

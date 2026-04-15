@@ -21,7 +21,16 @@ const WeatherAnalysisOutputSchema = z.object({
 export type WeatherAnalysisOutput = z.infer<typeof WeatherAnalysisOutputSchema>;
 
 export async function getWeatherAnalysis(input: WeatherAnalysisInput): Promise<WeatherAnalysisOutput> {
-  return weatherAnalysisFlow(input);
+  try {
+    return await weatherAnalysisFlow(input);
+  } catch (error: any) {
+    console.error("Vercel AI Error:", error);
+    return {
+      riskLevel: "Alto",
+      advice: `Error from Server: ${error?.message || "Unknown error"}`,
+      priorityTasks: ["Contact support", "Check Vercel Logs"]
+    };
+  }
 }
 
 const prompt = ai.definePrompt({
