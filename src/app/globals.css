@@ -63,7 +63,7 @@
     --ring: 102 60% 45%;
   }
 
-  .high-contrast {
+  :root.high-contrast {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
     --card: 0 0% 100%;
@@ -94,12 +94,26 @@
     --sidebar-ring: 0 0% 0%;
   }
 
-  .font-scale-large {
-    font-size: 110%;
+  /* Força a remoção de cores explícitas no alto contraste para dar efeito visual */
+  :root.high-contrast .bg-white {
+    background-color: transparent !important;
+  }
+  :root.high-contrast .text-primary {
+    color: hsl(var(--primary)) !important;
+  }
+  :root.high-contrast .bg-primary {
+    background-color: hsl(var(--primary)) !important;
+  }
+  :root.high-contrast .text-muted-foreground {
+    color: hsl(var(--foreground)) !important;
   }
 
-  .font-scale-x-large {
-    font-size: 125%;
+  :root.font-scale-large {
+    font-size: 110% !important;
+  }
+
+  :root.font-scale-x-large {
+    font-size: 125% !important;
   }
 }
 
