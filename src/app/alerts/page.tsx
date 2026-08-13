@@ -1,219 +1,400 @@
-
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import { 
   Bell, 
   Calendar as CalendarIcon, 
   CheckCircle2, 
+  Circle,
   Clock, 
   AlertTriangle,
-  ChevronRight,
   Filter,
-  Hammer,
-  Scissors,
-  Droplets,
-  RefreshCcw
+  Plus,
+  Trash2,
+  Download,
+  CalendarCheck
 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
-
-const initialAlerts = [
-  { id: 1, title: "Vacinação Febre Aftosa", priority: "Alta", category: "Saúde Animal", date: "2024-02-28", status: "Pendente", icon: Bell, recurrence: "Atividade Única" },
-  { id: 2, title: "Adubação Cobertura Milho", priority: "Média", category: "Adubação", date: "2024-03-02", status: "Aguardando", icon: Droplets, recurrence: "Semanal" },
-  { id: 3, title: "Revisão Trator John Deere", priority: "Baixa", category: "Manutenção", date: "2024-03-05", status: "Pendente", icon: Hammer, recurrence: "Mensal" },
-  { id: 4, title: "Troca de Pasto Lote B", priority: "Média", category: "Manejo", date: "2024-03-01", status: "Concluído", icon: CheckCircle2, recurrence: "Atividade Única" },
-  { id: 5, title: "Reparo de Cerca Divisa Sul", priority: "Alta", category: "Infraestrutura", date: "2024-03-04", status: "Pendente", icon: Hammer, recurrence: "Atividade Única" },
-  { id: 6, title: "Poda de Limpeza Pomar", priority: "Baixa", category: "Podas", date: "2024-03-10", status: "Aguardando", icon: Scissors, recurrence: "Anual" },
-]
+import { useAlerts, useCategories } from "@/hooks/use-roca-db"
+import { AlertTaskItem } from "@/lib/db"
+import { exportToCSV } from "@/lib/export-utils"
+import { useToast } from "@/hooks/use-toast"
 
 export default function AlertsPage() {
+  const { alerts, saveAlert, toggleAlertStatus, deleteAlert } = useAlerts()
+  const { categories } = useCategories()
+  const { toast } = useToast()
+
   const [date, setDate] = useState<Date | undefined>(undefined)
-  const [tasks, setTasks] = useState(initialAlerts)
-  
+  const [filterStatus, setFilterStatus] = useState<"all" | "Pendente" | "Concluído">("all")
+  const [searchTerm, setSearchTerm] = useState("")
+
+  // Form State
   const [newTaskTitle, setNewTaskTitle] = useState("")
   const [newTaskDate, setNewTaskDate] = useState("")
-  const [newTaskPriority, setNewTaskPriority] = useState("")
+  const [newTaskPriority, setNewTaskPriority] = useState<"Alta" | "Média" | "Baixa">("Média")
   const [newTaskCategory, setNewTaskCategory] = useState("")
-  const [newTaskRecurrence, setNewTaskRecurrence] = useState("")
+  const [newTaskRecurrence, setNewTaskRecurrence] = useState("Atividade Única")
+  const [newTaskNotes, setNewTaskNotes] = useState("")
 
   useEffect(() => {
     setDate(new Date())
+    setNewTaskDate(new Date().toISOString().split("T")[0])
   }, [])
 
-  const handleAddTask = () => {
-    if (!newTaskTitle) return
-    const newTask = {
-      id: Date.now(),
-      title: newTaskTitle,
-      priority: newTaskPriority || "Baixa",
-      category: newTaskCategory || "Geral",
+  const filteredAlerts = alerts.filter(task => {
+    const matchesStatus = filterStatus === "all" || task.status === filterStatus
+    const matchesSearch = 
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.category.toLowerCase().includes(searchTerm.toLowerCase())
+    return matchesStatus && matchesSearch
+  })
+
+  const handleAddTask = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!newTaskTitle.trim()) {
+      toast({
+        title: "Título obrigatório",
+        description: "Por favor, digite o nome da tarefa ou alerta.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    const defaultCat = categories[0]?.name || "Geral"
+    saveAlert({
+      title: newTaskTitle.trim(),
+      priority: newTaskPriority,
+      category: newTaskCategory || defaultCat,
       date: newTaskDate || (date ? date.toISOString().split("T")[0] : new Date().toISOString().split("T")[0]),
       status: "Pendente",
-      icon: Bell,
       recurrence: newTaskRecurrence,
-    }
-    setTasks([newTask, ...tasks])
+      notes: newTaskNotes.trim() || undefined
+    })
+
+    toast({
+      title: "Tarefa agendada!",
+      description: `"${newTaskTitle}" foi inserida no calendário de campo.`
+    })
+
     setNewTaskTitle("")
-    setNewTaskDate("")
-    setNewTaskPriority("")
-    setNewTaskCategory("")
-    setNewTaskRecurrence("")
+    setNewTaskNotes("")
   }
+
+  const handleToggle = (task: AlertTaskItem) => {
+    toggleAlertStatus(task.id)
+    toast({
+      title: task.status === "Concluído" ? "Tarefa reaberta" : "Tarefa concluída!",
+      description: `"${task.title}" atualizada.`
+    })
+  }
+
+  const handleDelete = (task: AlertTaskItem) => {
+    if (confirm(`Excluir a tarefa "${task.title}"?`)) {
+      deleteAlert(task.id)
+      toast({
+        title: "Tarefa removida",
+        description: `"${task.title}" foi excluída.`
+      })
+    }
+  }
+
+  const handleExport = () => {
+    const data = filteredAlerts.map(a => ({
+      ID: a.id,
+      Título: a.title,
+      Prioridade: a.priority,
+      Categoria: a.category,
+      "Data Prevista": a.date,
+      Status: a.status,
+      Recorrência: a.recurrence || "Única",
+      Notas: a.notes || ""
+    }))
+    exportToCSV("tarefas_alertas_rocactrl", data)
+  }
+
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case "Alta":
+        return <Badge className="bg-rose-600/15 text-rose-700 hover:bg-rose-600/25 border-rose-300">Alta</Badge>
+      case "Média":
+        return <Badge className="bg-amber-600/15 text-amber-700 hover:bg-amber-600/25 border-amber-300">Média</Badge>
+      case "Baixa":
+        return <Badge className="bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/25 border-emerald-300">Baixa</Badge>
+      default:
+        return <Badge variant="outline">{priority}</Badge>
+    }
+  }
+
+  const pendingCount = alerts.filter(a => a.status === "Pendente" || a.status === "Aguardando").length
+  const completedCount = alerts.filter(a => a.status === "Concluído").length
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Cabeçalho */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Tarefas e Alertas</h1>
-          <p className="text-muted-foreground">Cronograma de tarefas e lembretes automáticos.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary flex items-center gap-3">
+            <Bell className="h-8 w-8 text-primary" /> Tarefas, Alertas e Calendário
+          </h1>
+          <p className="text-muted-foreground">
+            Cronograma de campo, lembretes de vacinação, adubação e manejo de rotina.
+          </p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Filter className="h-4 w-4" /> Filtros
-        </Button>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" /> Exportar CSV
+          </Button>
+        </div>
       </div>
 
+      {/* Grid Principal: Calendário + Formulário na esquerda, Lista na direita */}
       <div className="grid lg:grid-cols-3 gap-6">
+        {/* Coluna Lateral: Calendário e Nova Tarefa */}
         <div className="space-y-6 lg:col-span-1">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Calendário de Campo</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4 text-primary" /> Calendário de Campo
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center">
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border"
+                  onSelect={(d) => {
+                    setDate(d)
+                    if (d) setNewTaskDate(d.toISOString().split("T")[0])
+                  }}
+                  className="rounded-md border p-2"
                 />
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Nova Rotina / Tarefa</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Plus className="h-4 w-4 text-primary" /> Nova Rotina / Tarefa
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Input 
-                placeholder="O que precisa ser feito?" 
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-              />
-              <Input 
-                type="date" 
-                value={newTaskDate}
-                onChange={(e) => setNewTaskDate(e.target.value)}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <Select value={newTaskPriority} onValueChange={setNewTaskPriority}>
-                  <SelectTrigger><SelectValue placeholder="Prioridade" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Alta">Alta</SelectItem>
-                    <SelectItem value="Média">Média</SelectItem>
-                    <SelectItem value="Baixa">Baixa</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={newTaskCategory} onValueChange={setNewTaskCategory}>
-                  <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Saúde Animal">Saúde</SelectItem>
-                    <SelectItem value="Adubação">Adubação</SelectItem>
-                    <SelectItem value="Podas">Podas</SelectItem>
-                    <SelectItem value="Manutenção">Manutenção</SelectItem>
-                    <SelectItem value="Manejo">Manejo</SelectItem>
-                    <SelectItem value="Infraestrutura">Infra</SelectItem>
-                    <SelectItem value="Geral">Geral</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="col-span-2">
-                  <Select value={newTaskRecurrence} onValueChange={setNewTaskRecurrence}>
-                    <SelectTrigger><SelectValue placeholder="Recorrência" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Atividade Única">Atividade Única</SelectItem>
-                      <SelectItem value="Diária">Diária</SelectItem>
-                      <SelectItem value="Semanal">Semanal</SelectItem>
-                      <SelectItem value="Mensal">Mensal</SelectItem>
-                      <SelectItem value="Anual">Anual</SelectItem>
-                    </SelectContent>
-                  </Select>
+            <CardContent>
+              <form onSubmit={handleAddTask} className="space-y-3">
+                <div className="space-y-1">
+                  <Label htmlFor="task-title" className="text-xs">Título da Tarefa *</Label>
+                  <Input
+                    id="task-title"
+                    placeholder="Ex: Vacinação, Poda limoeiro, Adubação..."
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    className="h-8 text-xs"
+                  />
                 </div>
-              </div>
-              <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleAddTask}>
-                Adicionar Tarefa
-              </Button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="task-date" className="text-xs">Data</Label>
+                    <Input
+                      id="task-date"
+                      type="date"
+                      value={newTaskDate}
+                      onChange={(e) => setNewTaskDate(e.target.value)}
+                      className="h-8 text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="task-priority" className="text-xs">Prioridade</Label>
+                    <select
+                      id="task-priority"
+                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      value={newTaskPriority}
+                      onChange={(e) => setNewTaskPriority(e.target.value as any)}
+                    >
+                      <option value="Alta">Alta</option>
+                      <option value="Média">Média</option>
+                      <option value="Baixa">Baixa</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="task-category" className="text-xs">Categoria</Label>
+                    <select
+                      id="task-category"
+                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      value={newTaskCategory}
+                      onChange={(e) => setNewTaskCategory(e.target.value)}
+                    >
+                      {categories.map(c => (
+                        <option key={c.id} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="task-rec" className="text-xs">Recorrência</Label>
+                    <select
+                      id="task-rec"
+                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      value={newTaskRecurrence}
+                      onChange={(e) => setNewTaskRecurrence(e.target.value)}
+                    >
+                      <option value="Atividade Única">Atividade Única</option>
+                      <option value="Diária">Diária</option>
+                      <option value="Semanal">Semanal</option>
+                      <option value="Quinzenal">Quinzenal</option>
+                      <option value="Mensal">Mensal</option>
+                      <option value="Semestral">Semestral</option>
+                      <option value="Anual">Anual</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="task-notes" className="text-xs">Observações (Opcional)</Label>
+                  <Input
+                    id="task-notes"
+                    placeholder="Instruções de aplicação ou horário..."
+                    value={newTaskNotes}
+                    onChange={(e) => setNewTaskNotes(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+
+                <Button type="submit" className="w-full h-8 text-xs bg-primary hover:bg-primary/90 mt-2">
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Agendar Tarefa
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Lista de Tarefas</CardTitle>
-            <Badge variant="outline">{tasks.length} Totais</Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {tasks.map((alert) => (
-                <div 
-                  key={alert.id} 
-                  className={`flex items-center gap-4 p-4 rounded-xl border-l-4 transition-all hover:bg-muted/50 ${
-                    alert.status === 'Concluído' ? 'border-l-green-500 bg-green-50/30' : 
-                    alert.priority === 'Alta' ? 'border-l-red-500' : 'border-l-primary'
-                  }`}
+        {/* Coluna Principal: Lista de Tarefas */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Barra de Filtros */}
+          <Card>
+            <CardContent className="p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="relative w-full sm:w-64">
+                <Input
+                  placeholder="Buscar tarefa..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                <Button
+                  variant={filterStatus === "all" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => setFilterStatus("all")}
                 >
-                  <div className={`p-2 rounded-full ${
-                    alert.status === 'Concluído' ? 'bg-green-100 text-green-600' : 
-                    alert.priority === 'Alta' ? 'bg-red-100 text-red-600' : 'bg-primary/10 text-primary'
-                  }`}>
-                    {alert.status === 'Concluído' ? <CheckCircle2 className="h-5 w-5" /> : 
-                     alert.priority === 'Alta' ? <AlertTriangle className="h-5 w-5" /> : 
-                     <Clock className="h-5 w-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1 gap-2">
-                      <h4 className={`font-bold truncate ${alert.status === 'Concluído' ? 'line-through text-muted-foreground' : ''}`}>
-                        {alert.title}
-                      </h4>
-                      <div className="flex gap-2">
-                        {alert.recurrence && alert.recurrence !== 'Atividade Única' && (
-                          <Badge variant="outline" className="flex-shrink-0 bg-blue-50 text-blue-700 border-blue-200">
-                            <RefreshCcw className="h-3 w-3 mr-1" />
-                            {alert.recurrence}
-                          </Badge>
-                        )}
-                        <Badge variant={alert.priority === 'Alta' ? 'destructive' : 'secondary'} className="flex-shrink-0">
-                          {alert.priority}
-                        </Badge>
+                  Todas ({alerts.length})
+                </Button>
+                <Button
+                  variant={filterStatus === "Pendente" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs text-amber-700"
+                  onClick={() => setFilterStatus("Pendente")}
+                >
+                  Pendentes ({pendingCount})
+                </Button>
+                <Button
+                  variant={filterStatus === "Concluído" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs text-emerald-700"
+                  onClick={() => setFilterStatus("Concluído")}
+                >
+                  Concluídas ({completedCount})
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Lista de Cards de Tarefas */}
+          <div className="space-y-3">
+            {filteredAlerts.length === 0 ? (
+              <div className="text-center py-12 bg-card rounded-xl border border-dashed text-muted-foreground">
+                <CalendarCheck className="h-10 w-10 mx-auto opacity-30 mb-2" />
+                <p className="text-base font-medium">Nenhuma tarefa encontrada.</p>
+                <p className="text-xs text-muted-foreground mt-1">Utilize o formulário ao lado para agendar novas tarefas.</p>
+              </div>
+            ) : (
+              filteredAlerts.map((task) => {
+                const isCompleted = task.status === "Concluído"
+                return (
+                  <Card 
+                    key={task.id} 
+                    className={`transition-all hover:shadow-xs ${isCompleted ? "opacity-70 bg-muted/20 border-muted" : "border-l-4 border-l-primary"}`}
+                  >
+                    <CardContent className="p-4 flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <button
+                          onClick={() => handleToggle(task)}
+                          className="mt-0.5 text-muted-foreground hover:text-primary transition-colors shrink-0"
+                          title={isCompleted ? "Marcar como pendente" : "Marcar como concluído"}
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                          ) : (
+                            <Circle className="h-5 w-5 hover:text-primary" />
+                          )}
+                        </button>
+
+                        <div className="space-y-1">
+                          <h4 className={`text-sm font-semibold ${isCompleted ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                            {task.title}
+                          </h4>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1 font-mono">
+                              <CalendarIcon className="h-3 w-3" /> {task.date}
+                            </span>
+                            <span>•</span>
+                            <span>{task.category}</span>
+                            {task.recurrence && (
+                              <>
+                                <span>•</span>
+                                <span className="text-[11px] bg-muted px-1.5 py-0.5 rounded">{task.recurrence}</span>
+                              </>
+                            )}
+                          </div>
+                          {task.notes && (
+                            <p className="text-xs text-muted-foreground italic mt-1 bg-muted/40 p-1.5 rounded">
+                              {task.notes}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4 text-[10px] md:text-xs text-muted-foreground flex-wrap">
-                      <span className="flex items-center gap-1 shrink-0">
-                        <CalendarIcon className="h-3 w-3" /> {alert.date}
-                      </span>
-                      <span className="font-medium text-primary uppercase tracking-tight flex items-center gap-1 shrink-0">
-                        {alert.category === "Infraestrutura" && <Hammer className="h-3 w-3" />}
-                        {alert.category === "Podas" && <Scissors className="h-3 w-3" />}
-                        {alert.category === "Adubação" && <Droplets className="h-3 w-3" />}
-                        {alert.category}
-                      </span>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="shrink-0 group-hover:bg-background">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full mt-6" variant="outline">
-              Ver Todas as Tarefas
-            </Button>
-          </CardContent>
-        </Card>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {getPriorityBadge(task.priority)}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDelete(task)}
+                          title="Excluir"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

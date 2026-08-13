@@ -3,8 +3,9 @@
 import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { Label } from "@/components/ui/label"
 import { 
   BarChart, 
   Bar, 
@@ -14,189 +15,597 @@ import {
   Tooltip as ChartTooltip, 
   ResponsiveContainer, 
   Legend,
-  AreaChart,
-  Area
+  PieChart,
+  Pie,
+  Cell
 } from "recharts"
 import { 
   TrendingUp,
+  TrendingDown,
   Wallet,
   ArrowUpRight,
   ArrowDownRight,
   DollarSign,
-  PieChart as PieChartIcon,
   Download,
-  Upload,
+  Plus,
+  Trash2,
+  Filter,
+  Search,
   Sprout,
-  PawPrint
+  PawPrint,
+  CheckCircle2
 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table"
+import { useTransactions, useCategories, useAnimals, useCrops } from "@/hooks/use-roca-db"
+import { TransactionItem } from "@/lib/db"
+import { exportToCSV } from "@/lib/export-utils"
+import { useToast } from "@/hooks/use-toast"
 
-// Mock Data para MVP
-const profitData = [
-  { month: "Jan", despesas: 1200, receitas: 3500 },
-  { month: "Fev", despesas: 1800, receitas: 4200 },
-  { month: "Mar", despesas: 1400, receitas: 3800 },
-  { month: "Abr", despesas: 2100, receitas: 5500 },
-  { month: "Mai", despesas: 1600, receitas: 4800 },
-  { month: "Jun", despesas: 2400, receitas: 6200 },
-]
-
-const unitCosts = [
-  { group: "Lote Frangos 01", type: "animal", totalCost: 480, projectedYield: 1200, status: "Alta Margem" },
-  { group: "Limoeiros Siciliano", type: "crop", totalCost: 150, projectedYield: 800, status: "Média Margem" },
-  { group: "Tanque Tilápia 04", type: "animal", totalCost: 950, projectedYield: 3000, status: "Alta Margem" },
-  { group: "Canteiro Tomate", type: "crop", totalCost: 320, projectedYield: 400, status: "Risco/Baixa Margem" },
-]
+const COLORS = ["#16a34a", "#22c55e", "#eab308", "#3b82f6", "#8b5cf6", "#ec4899", "#f97316"]
 
 export default function FinancialPage() {
-  const [loading] = useState(false)
+  const { transactions, saveTransaction, deleteTransaction } = useTransactions()
+  const { categories } = useCategories()
+  const { animals } = useAnimals()
+  const { crops } = useCrops()
+  const { toast } = useToast()
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filterType, setFilterType] = useState<"all" | "receita" | "despesa">("all")
+  
+  // Dialog State
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [formData, setFormData] = useState<{
+    description: string
+    type: "receita" | "despesa"
+    category: string
+    amount: string
+    date: string
+    relatedType: "animal" | "crop" | "geral"
+    relatedName: string
+    paymentMethod: "Pix" | "Dinheiro" | "Cartão" | "Boleto" | "Outro"
+    notes: string
+  }>({
+    description: "",
+    type: "receita",
+    category: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    relatedType: "geral",
+    relatedName: "",
+    paymentMethod: "Pix",
+    notes: ""
+  })
+
+  // Categorias para finanças
+  const finCategories = categories.filter(c => c.sector === "Financeiro" || c.sector === "Geral" || c.sector === "Insumos")
+
+  const filteredTransactions = transactions.filter(tx => {
+    const matchesType = filterType === "all" || tx.type === filterType
+    const matchesSearch = 
+      tx.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (tx.relatedName && tx.relatedName.toLowerCase().includes(searchTerm.toLowerCase()))
+    return matchesType && matchesSearch
+  })
+
+  // Cálculos financeiros totais
+  const totalReceitas = transactions
+    .filter(t => t.type === "receita")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
+  const totalDespesas = transactions
+    .filter(t => t.type === "despesa")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
+  const saldoLiquido = totalReceitas - totalDespesas
+  const margemLucro = totalReceitas > 0 ? ((saldoLiquido / totalReceitas) * 100).toFixed(1) : "0"
+
+  // Agrupamento por mês para o gráfico
+  const monthlyMap: Record<string, { month: string, receitas: number, despesas: number }> = {}
+  transactions.forEach(tx => {
+    const month = tx.date ? tx.date.substring(0, 7) : "2026-04"
+    if (!monthlyMap[month]) {
+      monthlyMap[month] = { month, receitas: 0, despesas: 0 }
+    }
+    if (tx.type === "receita") {
+      monthlyMap[month].receitas += Number(tx.amount || 0)
+    } else {
+      monthlyMap[month].despesas += Number(tx.amount || 0)
+    }
+  })
+  const chartData = Object.values(monthlyMap).sort((a, b) => a.month.localeCompare(b.month))
+
+  // Gráfico de distribuição por categoria
+  const categoryMap: Record<string, number> = {}
+  transactions.forEach(tx => {
+    const cat = tx.category || "Outros"
+    categoryMap[cat] = (categoryMap[cat] || 0) + Number(tx.amount || 0)
+  })
+  const pieData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }))
+
+  const handleOpenDialog = (type: "receita" | "despesa" = "receita") => {
+    const defaultCat = finCategories[0]?.name || (type === "receita" ? "Venda de Produtos Agro" : "Custos Operacionais e Ração")
+    setFormData({
+      description: "",
+      type,
+      category: defaultCat,
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      relatedType: "geral",
+      relatedName: "",
+      paymentMethod: "Pix",
+      notes: ""
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleSave = () => {
+    const val = parseFloat(formData.amount.replace(",", "."))
+    if (!formData.description.trim() || isNaN(val) || val <= 0) {
+      toast({
+        title: "Dados inválidos",
+        description: "Informe a descrição e um valor monetário positivo.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    saveTransaction({
+      description: formData.description.trim(),
+      type: formData.type,
+      category: formData.category || "Geral",
+      amount: val,
+      date: formData.date,
+      relatedType: formData.relatedType,
+      relatedName: formData.relatedName.trim() || undefined,
+      paymentMethod: formData.paymentMethod,
+      status: "Concluído",
+      notes: formData.notes.trim() || undefined
+    })
+
+    toast({
+      title: formData.type === "receita" ? "Receita registrada!" : "Despesa registrada!",
+      description: `R$ ${val.toFixed(2)} lançado com sucesso.`
+    })
+
+    setIsDialogOpen(false)
+  }
+
+  const handleDelete = (tx: TransactionItem) => {
+    if (confirm(`Remover o lançamento "${tx.description}"?`)) {
+      deleteTransaction(tx.id)
+      toast({
+        title: "Lançamento excluído",
+        description: "O registro financeiro foi removido."
+      })
+    }
+  }
+
+  const handleExport = () => {
+    const data = filteredTransactions.map(t => ({
+      ID: t.id,
+      Descrição: t.description,
+      Tipo: t.type.toUpperCase(),
+      Categoria: t.category,
+      "Valor (R$)": t.amount.toFixed(2),
+      Data: t.date,
+      Vínculo: t.relatedName || "Geral",
+      "Forma de Pagamento": t.paymentMethod || "Pix",
+      Status: t.status
+    }))
+    exportToCSV("relatorio_financeiro_rocactrl", data)
+  }
 
   return (
     <div className="space-y-6">
+      {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary flex items-center gap-3">
-            <Wallet className="h-8 w-8 text-green-600" /> Planejamento Financeiro
+            <Wallet className="h-8 w-8 text-primary" /> Planejamento & Controle Financeiro
           </h1>
-          <p className="text-muted-foreground">Controle de lucros, custos de manejo e projeção de receita.</p>
+          <p className="text-muted-foreground">
+            Gestão de receitas, custos de manejo, insumos e fluxo de caixa da propriedade.
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Upload className="h-4 w-4 text-muted-foreground" /> Importar Dados
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+            <Download className="h-4 w-4" /> Exportar CSV
           </Button>
-          <Button variant="default" className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
-            <Download className="h-4 w-4" /> Exportar Relatório
+          <Button onClick={() => handleOpenDialog("despesa")} variant="outline" className="border-rose-300 text-rose-700 hover:bg-rose-50 gap-2">
+            <ArrowDownRight className="h-4 w-4" /> Nova Despesa
+          </Button>
+          <Button onClick={() => handleOpenDialog("receita")} className="bg-primary hover:bg-primary/90 gap-2">
+            <ArrowUpRight className="h-4 w-4" /> Nova Receita
           </Button>
         </div>
       </div>
-      {/* KPIs Principais */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Bruta (Ano)</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 28.000,00</div>
-            <p className="text-xs text-green-600 flex items-center mt-1 font-medium">
-              <ArrowUpRight className="h-3 w-3 mr-1" /> +15% desde o último ano
+
+      {/* Cards de Saldo e Indicadores */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-l-4 border-l-emerald-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground font-medium">Total de Receitas</p>
+              <span className="p-1.5 rounded-full bg-emerald-100 text-emerald-700">
+                <ArrowUpRight className="h-4 w-4" />
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-emerald-600 mt-1">
+              R$ {totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Vendas e comercialização</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Custos Insumos Agrícolas</CardTitle>
-            <Sprout className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 3.450,00</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Fertilizantes e Pesticidas
+
+        <Card className="border-l-4 border-l-rose-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground font-medium">Total de Despesas</p>
+              <span className="p-1.5 rounded-full bg-rose-100 text-rose-700">
+                <ArrowDownRight className="h-4 w-4" />
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-rose-600 mt-1">
+              R$ {totalDespesas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Insumos, ração e manejo</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Custo Saúde & Ração</CardTitle>
-            <PawPrint className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ 7.050,00</div>
-            <p className="text-xs text-red-500 flex items-center mt-1 font-medium">
-              <ArrowUpRight className="h-3 w-3 mr-1" /> +2% devido a aumento de ração
+
+        <Card className={`border-l-4 ${saldoLiquido >= 0 ? "border-l-primary" : "border-l-rose-600"}`}>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground font-medium">Saldo Líquido</p>
+              <span className="p-1.5 rounded-full bg-primary/10 text-primary">
+                <Wallet className="h-4 w-4" />
+              </span>
+            </div>
+            <p className={`text-2xl font-bold mt-1 ${saldoLiquido >= 0 ? "text-primary" : "text-rose-600"}`}>
+              R$ {saldoLiquido.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Resultado acumulado</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-50 border-green-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-green-800">Margem de Lucro</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-black text-green-700">62.5%</div>
-            <Progress value={62.5} className="h-2 mt-2 bg-green-200" />
+
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground font-medium">Margem Operacional</p>
+              <span className="p-1.5 rounded-full bg-blue-100 text-blue-700">
+                <TrendingUp className="h-4 w-4" />
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-blue-600 mt-1">{margemLucro}%</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Eficiência de retorno</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Gráficos e Projeções */}
+      {/* Gráficos de Fluxo Financeiro */}
       <div className="grid gap-6 lg:grid-cols-7">
-        <Card className="lg:col-span-5">
+        <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Fluxo de Caixa e Projeção</CardTitle>
-            <CardDescription>Comparativo mensal entre Receitas Geradas vs Despesas de Manejo</CardDescription>
+            <CardTitle className="font-headline text-lg">Fluxo de Caixa (Receitas vs Despesas)</CardTitle>
+            <CardDescription>Evolução mensal dos lançamentos financeiros</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="h-[350px] w-full">
+          <CardContent className="pl-2">
+            <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={profitData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorReceitas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorDespesas" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickFormatter={(value) => `R$${value}`}
-                  />
-                  <ChartTooltip formatter={(value) => `R$ ${value}`} />
+                <BarChart data={chartData.length ? chartData : [{ month: "Atual", receitas: totalReceitas, despesas: totalDespesas }]}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$ ${val}`} />
+                  <ChartTooltip formatter={(value: any) => [`R$ ${Number(value).toFixed(2)}`, ""]} />
                   <Legend />
-                  <Area type="monotone" dataKey="receitas" name="Receitas Brutas" stroke="#22c55e" fillOpacity={1} fill="url(#colorReceitas)" />
-                  <Area type="monotone" dataKey="despesas" name="Despesas (Ração/Insumos)" stroke="#ef4444" fillOpacity={1} fill="url(#colorDespesas)" />
-                </AreaChart>
+                  <Bar dataKey="receitas" fill="#22c55e" name="Receitas (R$)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="despesas" fill="#ef4444" name="Despesas (R$)" radius={[4, 4, 0, 0]} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* Resumo de Custos Unitários */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Rentabilidade por Unidade</CardTitle>
-            <CardDescription>Custo vs Retorno Esperado</CardDescription>
+            <CardTitle className="font-headline text-lg">Distribuição por Categoria</CardTitle>
+            <CardDescription>Volume movimentado por tipo de operação</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {unitCosts.map((item, index) => {
-              const profitROI = Math.round(((item.projectedYield - item.totalCost) / item.totalCost) * 100)
-              
-              return (
-                <div key={index} className="space-y-2 border-b pb-4 last:border-0 last:pb-0">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      {item.type === 'animal' ? <PawPrint className="h-4 w-4 text-blue-500" /> : <Sprout className="h-4 w-4 text-green-500" />}
-                      <span className="font-bold text-sm">{item.group}</span>
-                    </div>
-                    <Badge variant={profitROI > 100 ? "default" : "destructive"}>
-                      ROI {profitROI}%
-                    </Badge>
-                  </div>
-                  
-                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                    <span>Gasto: R$ {item.totalCost}</span>
-                    <span>Retorno Estimado: R$ {item.projectedYield}</span>
-                  </div>
-                  <Progress 
-                    value={(item.totalCost / item.projectedYield) * 100} 
-                    className={`h-1 !bg-muted ${profitROI > 100 ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'}`} 
-                  />
-                  {profitROI < 100 && (
-                    <p className="text-[10px] text-red-500 italic mt-1 font-medium">⚠️ Custo com insumos/ração alto para o retorno.</p>
-                  )}
-                </div>
-              )
-            })}
+          <CardContent>
+            <div className="h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={({ name }) => name.split(" ")[0]}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip formatter={(value: any) => [`R$ ${Number(value).toFixed(2)}`, "Total"]} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Histórico e Tabela de Lançamentos */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-lg">Extrato e Lançamentos ({filteredTransactions.length})</CardTitle>
+              <CardDescription>Histórico detalhado de entradas e saídas.</CardDescription>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar lançamento..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-8 text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  variant={filterType === "all" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => setFilterType("all")}
+                >
+                  Todos
+                </Button>
+                <Button
+                  variant={filterType === "receita" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs text-emerald-700"
+                  onClick={() => setFilterType("receita")}
+                >
+                  Receitas
+                </Button>
+                <Button
+                  variant={filterType === "despesa" ? "default" : "outline"}
+                  size="sm"
+                  className="h-8 text-xs text-rose-700"
+                  onClick={() => setFilterType("despesa")}
+                >
+                  Despesas
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40">
+                  <TableHead>Data</TableHead>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Vínculo</TableHead>
+                  <TableHead>Pagamento</TableHead>
+                  <TableHead className="text-right">Valor</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTransactions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      Nenhum lançamento encontrado.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredTransactions.map((tx) => (
+                    <TableRow key={tx.id} className="hover:bg-muted/20">
+                      <TableCell className="text-xs font-mono text-muted-foreground">
+                        {tx.date}
+                      </TableCell>
+                      <TableCell className="font-semibold text-foreground">
+                        {tx.description}
+                      </TableCell>
+                      <TableCell>
+                        {tx.type === "receita" ? (
+                          <Badge className="bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/25 border-emerald-300">
+                            Receita
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-rose-600/15 text-rose-700 hover:bg-rose-600/25 border-rose-300">
+                            Despesa
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {tx.category}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {tx.relatedName || "Geral"}
+                      </TableCell>
+                      <TableCell className="text-xs font-medium">
+                        {tx.paymentMethod || "Pix"}
+                      </TableCell>
+                      <TableCell className={`text-right font-bold ${tx.type === "receita" ? "text-emerald-600" : "text-rose-600"}`}>
+                        {tx.type === "receita" ? "+ " : "- "}
+                        R$ {Number(tx.amount).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDelete(tx)}
+                          title="Excluir Lançamento"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Modal de Nova Transação */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-primary" />
+              {formData.type === "receita" ? "Registrar Receita" : "Registrar Despesa"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={formData.type === "receita" ? "default" : "outline"}
+                className={`flex-1 ${formData.type === "receita" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+                onClick={() => setFormData({ ...formData, type: "receita" })}
+              >
+                <ArrowUpRight className="h-4 w-4 mr-1" /> Receita (Entrada)
+              </Button>
+              <Button
+                type="button"
+                variant={formData.type === "despesa" ? "default" : "outline"}
+                className={`flex-1 ${formData.type === "despesa" ? "bg-rose-600 hover:bg-rose-700 text-white" : ""}`}
+                onClick={() => setFormData({ ...formData, type: "despesa" })}
+              >
+                <ArrowDownRight className="h-4 w-4 mr-1" /> Despesa (Saída)
+              </Button>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-desc">Descrição do Lançamento *</Label>
+              <Input
+                id="tx-desc"
+                placeholder={formData.type === "receita" ? "Ex: Venda de 10 dúzias de ovos, colheita alface..." : "Ex: Compra de saco de ração 50kg, adubo orgânico..."}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-amount">Valor (R$) *</Label>
+                <Input
+                  id="tx-amount"
+                  placeholder="0,00"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-date">Data</Label>
+                <Input
+                  id="tx-date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-category">Categoria</Label>
+                <select
+                  id="tx-category"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                >
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-method">Forma de Pagamento</Label>
+                <select
+                  id="tx-method"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={formData.paymentMethod}
+                  onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
+                >
+                  <option value="Pix">Pix</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão">Cartão</option>
+                  <option value="Boleto">Boleto</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-related">Vínculo com Atividade (Opcional)</Label>
+              <select
+                id="tx-related"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={formData.relatedName}
+                onChange={(e) => setFormData({ ...formData, relatedName: e.target.value })}
+              >
+                <option value="">Geral / Sem Vínculo Específico</option>
+                <optgroup label="Animais">
+                  {animals.map(a => (
+                    <option key={a.id} value={`Animal: ${a.name}`}>{a.name} ({a.category})</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Culturas">
+                  {crops.map(c => (
+                    <option key={c.id} value={`Cultura: ${c.name}`}>{c.name} ({c.type})</option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+              Salvar Lançamento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

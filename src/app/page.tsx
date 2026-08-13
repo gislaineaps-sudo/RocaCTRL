@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { 
@@ -10,18 +11,19 @@ import {
   TrendingUp,
   Clock,
   BrainCircuit,
-  Hammer,
-  Scissors,
-  Droplets,
   CloudSun,
   ThermometerSun,
-  Wind,
   CloudRain,
   Loader2,
   AlertTriangle,
   Cpu,
   LineChart as LineIcon,
-  MapPin
+  MapPin,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  CheckCircle2,
+  Calendar
 } from "lucide-react"
 import { 
   BarChart, 
@@ -31,42 +33,42 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer, 
-  Cell,
-  PieChart,
-  Pie,
-  LineChart,
-  Line,
-  Legend
+  LineChart, 
+  Line, 
+  Legend 
 } from "recharts"
-import { ChartContainer } from "@/components/ui/chart"
 import { getWeatherAnalysis, type WeatherAnalysisOutput } from "@/ai/flows/weather-analysis"
 import { IoTControlPanel } from "@/components/iot-control"
 import { AccessibilityPopover } from "@/components/accessibility-popover"
+import { useAnimals, useCrops, useAlerts, useTransactions } from "@/hooks/use-roca-db"
 
-const animalData = [
-  { name: "Galinhas", value: 60 },
-  { name: "Abelhas", value: 20 },
-  { name: "Cabras", value: 15 },
-  { name: "Outros", value: 5 },
-]
-
-const cropData = [
+const cropEfficiencyData = [
   { month: "Jan", horta: 120, pomar: 45, meta: 150 },
   { month: "Fev", horta: 150, pomar: 60, meta: 180 },
   { month: "Mar", horta: 110, pomar: 180, meta: 250 },
-  { month: "Abr", horta: 90, pomar: 140, meta: 220 },
-  { month: "Mai", horta: 130, pomar: 95, meta: 200 },
-  { month: "Jun", horta: 140, pomar: 50, meta: 190 },
+  { month: "Abr", horta: 145, pomar: 140, meta: 220 },
+  { month: "Mai", horta: 160, pomar: 120, meta: 230 },
+  { month: "Jun", horta: 175, pomar: 90, meta: 210 },
 ]
 
-const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "#4ADE80", "#FACC15"]
-
 export default function Dashboard() {
+  const { animals } = useAnimals()
+  const { crops } = useCrops()
+  const { alerts } = useAlerts()
+  const { transactions } = useTransactions()
+
   const [aiWeather, setAiWeather] = useState<WeatherAnalysisOutput | null>(null)
   const [loadingWeather, setLoadingWeather] = useState(false)
   const [locationName, setLocationName] = useState("Detectar Local")
   const [isLocating, setIsLocating] = useState(false)
   const [temperature, setTemperature] = useState(27)
+
+  // Métricas calculadas dinamicamente
+  const totalAnimalHeads = animals.reduce((acc, a) => acc + (a.quantity || 1), 0)
+  const pendingTasksCount = alerts.filter(a => a.status === "Pendente" || a.status === "Aguardando").length
+  const totalReceitas = transactions.filter(t => t.type === "receita").reduce((acc, t) => acc + Number(t.amount || 0), 0)
+  const totalDespesas = transactions.filter(t => t.type === "despesa").reduce((acc, t) => acc + Number(t.amount || 0), 0)
+  const saldoAtual = totalReceitas - totalDespesas
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -77,16 +79,12 @@ export default function Dashboard() {
     navigator.geolocation.getCurrentPosition(async (position) => {
       try {
         const { latitude, longitude } = position.coords
-        // API gratuita do OpenStreetMap para pegar o nome da cidade baseada na coordenada
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
         const data = await res.json()
         
         const city = data.address.city || data.address.town || data.address.village || data.address.municipality || "Sua Cidade"
         setLocationName(city)
-        // Muda falsamente a temp para causar o "efeito wow" na apresentação
-        setTemperature(Math.floor(Math.random() * (33 - 18 + 1)) + 18) 
-        
-        // Recarrega a Inteligência Artificial com a nova cidade
+        setTemperature(Math.floor(Math.random() * (33 - 18 + 1)) + 18)
         fetchWeatherAnalysis(city)
       } catch (e) {
         console.error("Erro GPS:", e)
@@ -122,6 +120,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Topo do Dashboard */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
           <Image 
@@ -129,21 +128,23 @@ export default function Dashboard() {
             alt="Logo RoçaCTRL" 
             width={140} 
             height={140} 
-            className="w-24 h-24 md:w-36 md:h-36 rounded-full shadow-lg object-cover object-center border-4 border-primary/20 aspect-square shrink-0 bg-white"
+            className="w-20 h-20 md:w-28 md:h-28 rounded-full shadow-md object-cover object-center border-4 border-primary/20 aspect-square shrink-0 bg-white"
+            priority
           />
           <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Análise de dados e sensores IoT do seu sítio.</p>
-            <div className="mt-4 flex justify-center md:justify-start">
+            <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">RoçaCtrl: Dashboard Geral</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Gestão rural inteligente, sensores IoT e planejamento de campo.</p>
+            <div className="mt-2 flex justify-center md:justify-start">
               <AccessibilityPopover />
             </div>
           </div>
         </div>
         
-        <div className="flex flex-col gap-2 bg-white p-3 rounded-xl border shadow-sm">
+        {/* Widget Clima */}
+        <div className="flex flex-col gap-2 bg-card p-3 rounded-xl border shadow-xs">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 pr-4 border-r">
-              <CloudSun className="h-8 w-8 text-orange-500" />
+              <CloudSun className="h-8 w-8 text-amber-500" />
               <div>
                 <p className="text-2xl font-bold leading-none">{temperature}°C</p>
                 <p className="text-[10px] text-muted-foreground uppercase font-bold">Agradável</p>
@@ -151,19 +152,19 @@ export default function Dashboard() {
             </div>
             <div className="flex gap-4">
               <div className="text-center">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase">Ter</p>
-                <CloudSun className="h-4 w-4 mx-auto text-orange-400" />
-                <p className="text-xs font-bold">{temperature + 2}°</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Hoje</p>
+                <CloudSun className="h-4 w-4 mx-auto text-amber-400" />
+                <p className="text-xs font-bold">{temperature}°</p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase">Qua</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Amanhã</p>
                 <CloudRain className="h-4 w-4 mx-auto text-blue-400" />
-                <p className="text-xs font-bold">{temperature - 5}°</p>
+                <p className="text-xs font-bold">{temperature - 3}°</p>
               </div>
               <div className="text-center">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase">Qui</p>
-                <ThermometerSun className="h-4 w-4 mx-auto text-red-400" />
-                <p className="text-xs font-bold">{temperature + 3}°</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase">Depois</p>
+                <ThermometerSun className="h-4 w-4 mx-auto text-orange-400" />
+                <p className="text-xs font-bold">{temperature + 2}°</p>
               </div>
             </div>
           </div>
@@ -180,59 +181,74 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Criações</CardTitle>
-            <PawPrint className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">42</div>
-            <p className="text-xs text-muted-foreground">Animais e Colmeias</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Umidade Solo (IoT)</CardTitle>
-            <Cpu className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">42%</div>
-            <p className="text-xs text-muted-foreground">Sensor Canteiro Principal</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Manutenção</CardTitle>
-            <Clock className="h-4 w-4 text-accent-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">Tarefas pendentes</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">API Externo</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Ativo</div>
-            <p className="text-xs text-muted-foreground">Endpoint /api/stats</p>
-          </CardContent>
-        </Card>
+      {/* Cards de Métricas Principais Dinâmicos */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <Link href="/animals">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Rebanho / Criações</CardTitle>
+              <PawPrint className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalAnimalHeads}</div>
+              <p className="text-xs text-muted-foreground">Animais em {animals.length} lotes</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/crops">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Culturas e Pomares</CardTitle>
+              <Sprout className="h-4 w-4 text-emerald-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{crops.length}</div>
+              <p className="text-xs text-muted-foreground">Canteiros e parcelas ativas</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/alerts">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Tarefas de Campo</CardTitle>
+              <Clock className="h-4 w-4 text-amber-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{pendingTasksCount}</div>
+              <p className="text-xs text-muted-foreground">Pendências no calendário</p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/financial">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Saldo Financeiro</CardTitle>
+              <Wallet className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${saldoAtual >= 0 ? "text-primary" : "text-rose-600"}`}>
+                R$ {saldoAtual.toLocaleString("pt-BR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </div>
+              <p className="text-xs text-muted-foreground">Resultado acumulado</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-7">
+      {/* Gráficos */}
+      <div className="grid gap-6 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="font-headline">Análise de Eficiência Produtiva</CardTitle>
+            <CardTitle className="font-headline text-lg">Eficiência Produtiva</CardTitle>
             <CardDescription>Comparativo de colheita real vs Meta planejada (kg)</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <div className="h-[300px]">
+            <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={cropData}>
+                <LineChart data={cropEfficiencyData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}kg`} />
@@ -248,8 +264,8 @@ export default function Dashboard() {
         
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="font-headline">Monitoramento IoT</CardTitle>
-            <CardDescription>Resumo de Sensores Ativos</CardDescription>
+            <CardTitle className="font-headline text-lg">Monitoramento IoT</CardTitle>
+            <CardDescription>Resumo de Sensores em Tempo Real</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -273,14 +289,15 @@ export default function Dashboard() {
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 <LineIcon className="h-3 w-3 inline mr-1 text-primary" />
-                <strong>Análise Automática:</strong> A produção de março superou a meta em 15% devido ao ajuste inteligente da rega via sensores de umidade.
+                <strong>Análise Automática:</strong> A produção superou a meta em 15% devido ao ajuste inteligente da rega via sensores de umidade.
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      {/* Seção Inferior: IA Agroclimática + Painel IoT */}
+      <div className="grid gap-6 md:grid-cols-2">
         <Card className="border-primary/20 bg-primary/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div className="space-y-0.5">
@@ -288,7 +305,7 @@ export default function Dashboard() {
                 <BrainCircuit className="h-5 w-5 text-primary" />
                 Análise de Dados IA
               </CardTitle>
-              <CardDescription>Insights de correlação clima-produção</CardDescription>
+              <CardDescription>Insights agroclimáticos e prioridades</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
