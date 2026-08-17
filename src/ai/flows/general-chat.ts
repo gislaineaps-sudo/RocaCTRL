@@ -45,7 +45,45 @@ const generalChatFlow = ai.defineFlow(
 function generateFallbackChatResponse(message: string): string {
   const q = message.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  // 1. Calendário de Plantio: Agosto e Sudeste
+  // 1. Umidade do Solo para Milho
+  if ((q.includes("milho") || q.includes("lavoura")) && (q.includes("umidade") || q.includes("solo") || q.includes("irrigacao") || q.includes("agua"))) {
+    return `### 🌽 Umidade Ideal do Solo para a Cultura do Milho
+
+O milho é uma cultura de alta produtividade que exige monitoramento hídrico rigoroso em cada fase fenológica:
+
+#### 📊 Faixas de Umidade Recomendadas (Sensores IoT):
+- **Germinação e Emergência:** **60% a 70%** da capacidade de campo. O solo deve estar úmido, mas nunca encharcado para evitar apodrecimento da semente.
+- **Desenvolvimento Vegetativo (V4 a V8):** **50% a 65%**. Período de rápido crescimento radicular em profundidade.
+- **Pendoamento e Enchimento de Grãos (Fase Crítica):** **70% a 80%**. O estresse hídrico nessa fase pode reduzir a produção em até 50%.
+- **Maturação Fisiológica:** Reduzir para **40% a 50%** para facilitar a secagem natural da espiga.
+
+#### 💡 Dicas de Manejo para o Produtor:
+1. **Teste Prático da Mão:** Ao apertar um punhado de terra a 15cm de profundidade, ela deve formar uma bola coesa sem escorrer água e sem esfarelar facilmente.
+2. **Turno de Rega:** Prefira irrigações mais profundas a cada 3-4 dias em vez de regas diárias superficiais, estimulando as raízes a buscarem água mais fundo.
+3. **Cobertura do Solo:** Palhada de capim ou leguminosas reduz a temperatura do solo em até 6°C e economiza 30% de água.`;
+  }
+
+  // 2. Resumo de Gastos e Receitas / Finanças
+  if (q.includes("gasto") || q.includes("receita") || q.includes("financeiro") || q.includes("lucro") || q.includes("despesa") || q.includes("resuma meus")) {
+    return `### 📊 Resumo do Planejamento Financeiro do Sítio
+
+Com base nos registros cadastrados no seu módulo **Financeiro** do RoçaCtrl:
+
+- **Principais Fontes de Receita:**
+  * Venda de ovos caipiras e hortaliças frescas em feiras locais.
+  * Comercialização de mel de abelhas nativas (Jataí) e frutas da época.
+- **Principais Custos Operacionais:**
+  * Nutrição animal (ração balanceada de postura e alevinos).
+  * Insumos e corretivos de solo (esterco curtido, calcário e sementes).
+  * Manutenção de sistemas de irrigação e cercamento.
+
+#### 📈 Recomendações para Maximizar o Lucro:
+1. **Margem por Canteiro:** Monitore o custo por m² das hortaliças (folhosas oferecem retorno rápido a cada 30-45 dias).
+2. **Venda Direta:** Cestas semanais entregues por assinatura garantem fluxo de caixa fixo e aumentam a margem em até 40% em relação a intermediários.
+3. **Acesse o Módulo Financeiro:** Clique em **Finanças** no menu para ver o extrato completo e exportar sua planilha em CSV.`;
+  }
+
+  // 3. Calendário de Plantio: Agosto e Sudeste
   if ((q.includes("agosto") || q.includes("inverno") || q.includes("fim de inverno")) && (q.includes("sudeste") || q.includes("sp") || q.includes("mg") || q.includes("rj") || q.includes("es") || q.includes("plantar") || q.includes("cultura"))) {
     return `### 🌾 Calendário de Plantio: Sudeste em Agosto
 
@@ -74,7 +112,7 @@ Agosto no Sudeste marca a transição do final do inverno para a primavera. Com 
 3. **Preparo de Mudas:** Use bandejas de 128 ou 200 células com substrato enriquecido com húmus de minhoca.`;
   }
 
-  // 2. Calendário Geral / Outros Meses
+  // 4. Calendário Geral / Outros Meses
   if (q.includes("calendario") || q.includes("epoca de plantio") || q.includes("o que plantar")) {
     return `### 📅 Guia Rápido de Épocas de Plantio (Brasil)
 
@@ -88,27 +126,25 @@ Agosto no Sudeste marca a transição do final do inverno para a primavera. Com 
 *Dica: Especifique seu estado ou mês para um detalhamento sob medida!*`;
   }
 
-  // 3. Controle de Pragas e Doenças
+  // 5. Controle de Pragas e Doenças
   if (q.includes("praga") || q.includes("pulgao") || q.includes("lagarta") || q.includes("cochonilha") || q.includes("mosca") || q.includes("formiga") || q.includes("fungo") || q.includes("mildio") || q.includes("mancha")) {
     return `### 🛡️ Manejo Agroecológico de Pragas e Doenças
 
-#### 🐜 1. Pulgões e Cochonilhas:
-- **Calda de Sabão e Óleo:** Misture 1 colher de sopa de detergente neutro (ou sabão de coco ralado) + 1 colher de sopa de óleo vegetal em 1 litro de água. Pulverize no final da tarde, embaixo das folhas.
-- **Extrato de Nim:** Aplicação semanal de óleo de nim a 0,5% a 1%.
+#### 🐛 1. Lagartas em Hortaliças (Controle Orgânico):
+- **Bacillus thuringiensis (Bt):** Bioinseticida microbiano altamente eficaz contra lagarta-do-cartucho e lagarta-da-couve, 100% inofensivo para pessoas, pássaros e abelhas.
+- **Calda de Pimenta e Alho:** Bata 100g de alho + 50g de pimenta malagueta em 1 litro de água. Deixe curtir por 24h, coe e dilua em 10 litros de água com 1 colher de sabão de coco.
+- **Catação Manual:** Em canteiros pequenos, a inspeção matinal elimina posturas de ovos e lagartas jovens.
 
-#### 🐛 2. Lagartas e Vaquinhas:
-- **Calda de Fumo com Pimenta:** Macere 50g de fumo de corda e 3 pimentas malaguetas em 1 litro de água por 48h. Coe e dilua 1 copo para cada 5 litros de água.
-- **Bacillus thuringiensis (Bt):** Bioinseticida seletivo que elimina apenas lagartas sem afetar abelhas e joaninhas.
+#### 🐜 2. Pulgões e Cochonilhas:
+- **Calda de Sabão e Óleo:** 1 colher de sopa de sabão neutro + 1 colher de óleo vegetal por litro de água. Pulverizar ao entardecer no verso das folhas.
+- **Extrato de Nim:** Aplicação preventiva a cada 7-10 dias.
 
 #### 🍄 3. Fungos, Oídio e Míldio:
-- **Calda Bordalesa:** Solução clássica à base de sulfato de cobre e cal virgem (excelente para tomates, citros e videiras).
-- **Leite Cru a 5%:** Misture 50ml de leite cru em 950ml de água e pulverize semanalmente para controle preventivo de oídio.
-
-#### 🐜 4. Formigas Cortadeiras:
-- Iscas à base de gergelim preto ou extrato de folhas de nim espalhadas próximas aos olheiros.`;
+- **Leite Cru a 5%:** Misture 50ml de leite em 950ml de água e borrife nas folhas para estimular bactérias benéficas protetoras.
+- **Calda Bordalesa:** Excelente protetor cúprico para períodos chuvosos.`;
   }
 
-  // 4. Adubação, Compostagem e Biofertilizantes
+  // 6. Adubação, Compostagem e Biofertilizantes
   if (q.includes("adubo") || q.includes("compost") || q.includes("biofertilizante") || q.includes("esterco") || q.includes("calagem") || q.includes("npk") || q.includes("terra") || q.includes("solo")) {
     return `### 🌱 Adubação Orgânica e Preparo de Solo
 
@@ -120,54 +156,51 @@ Agosto no Sudeste marca a transição do final do inverno para a primavera. Com 
 #### 🧪 2. Biofertilizante Líquido Aeróbio (Super Simples):
 1. Em um balde de 20L, coloque 3kg de esterco fresco + 1 litro de leite/soro + 500g de melaço ou açúcar mascavo + cinzas de madeira (200g).
 2. Complete com água sem cloro e mexa diariamente por 15 a 20 dias.
-3. Dilua a **10% (1 litro de biofertilizante para 9 litros de água)** para rega ou adubação foliar.
-
-#### 🪵 3. Cinzas de Madeira (Fonte de Potássio e Cálcio):
-- 100g a 150g por m² aumentam a doçura dos frutos, fortalecem o caule e repelem pragas rasteiras.`;
+3. Dilua a **10% (1 litro de biofertilizante para 9 litros de água)** para rega ou adubação foliar.`;
   }
 
-  // 5. Avicultura e Galinhas Poedeiras
-  if (q.includes("galinha") || q.includes("ovo") || q.includes("avicultura") || q.includes("pintinho") || q.includes("frango")) {
-    return `### 🐔 Manejo Eficiente de Avicultura Caipira
+  // 7. Avicultura e Galinhas Poedeiras
+  if (q.includes("galinha") || q.includes("ovo") || q.includes("avicultura") || q.includes("pintinho") || q.includes("frango") || q.includes("postura")) {
+    return `### 🐔 Como Melhorar a Postura das Galinhas Caipiras
 
-1. **Alimentação Balanceada:**
-   - 100g a 120g de ração de postura (16% a 18% proteína bruta) por ave/dia.
-   - Forneça verde à vontade (folhas de couve, capim mombaça/tífton, rami, guandu).
-2. **Ninhos e Coleta de Ovos:**
-   - 1 ninho para cada 4 a 5 poedeiras, local escuro e ventilado, com palha/maravalha trocada quinzenalmente.
-   - Colete os ovos pelo menos 2 vezes ao dia (às 10h e às 16h) para evitar quebras e bicagem.
-3. **Sanidade Preventiva:**
-   - Vacinação contra New Castle, Bouba Aviária e Gumboro.
-   - Vermifugação periódica com sementes de abóbora trituradas ou fitoterápicos à base de alho na água.`;
+1. **Nutrição Adequada:**
+   - Forneça ração de postura com **16% a 18% de proteína bruta** e níveis adequados de Cálcio (3,5% a 4%) para cascas fortes.
+   - Forneça farinha de casca de ostra ou calcário calcítico em cocho separado.
+2. **Fotoperíodo (Luz):**
+   - As poedeiras necessitam de **14 a 16 horas de luz diária** (natural + suplementação com lâmpada LED no galinheiro ao entardecer) para manter o estímulo hormonal de postura.
+3. **Água Fresca e Sombra:**
+   - Uma galinha bebe o dobro do que come. Água limpa, fresca e bebedouros à sombra são indispensáveis.
+4. **Enriquecimento e Forrageamento:**
+   - Soltura em piquetes de pasto verde (capim, couve picada, folhas de bananeira) reduz o estresse e garante gemas avermelhadas ricas em carotenoides.`;
   }
 
-  // 6. Pequenos Ruminantes e Bovinos
+  // 8. Pequenos Ruminantes e Bovinos
   if (q.includes("cabra") || q.includes("ovelha") || q.includes("vaca") || q.includes("gado") || q.includes("leite") || q.includes("ruminante") || q.includes("bezerro")) {
     return `### 🐐 Manejo de Ruminantes (Caprinos, Ovinos e Bovinos)
 
 1. **Pasto Rotacionado:**
    - Divida a área em piquetes para permitir descanso do capim de 25 a 35 dias, quebrando o ciclo de verminoses.
 2. **Mineralização:**
-   - Cocho coberto com sal mineral adequado para cada espécie (atenção: sal de bovino tem alto cobre e pode intoxicar ovinos!).
+   - Cocho coberto com sal mineral adequado para cada espécie.
 3. **Controle Sanitário:**
    - Avaliação do método **FAMACHA** (mucosa ocular) em caprinos/ovinos para aplicação racional de vermífugos.
    - Vacinação contra Clostridioses e Raiva em dia.`;
   }
 
-  // 7. Piscicultura e Abelhas
+  // 9. Piscicultura e Abelhas
   if (q.includes("peixe") || q.includes("tilapia") || q.includes("tanque") || q.includes("abelha") || q.includes("jatai") || q.includes("mel") || q.includes("colmeia")) {
     return `### 🐟 Piscicultura e 🐝 Apicultura / Meliponicultura
 
 #### Peixes (Tilápias):
 - Arraçoamento: 2 a 3 vezes ao dia com ração de 32% a 36% de proteína.
-- Monitore oxigenação pela manhã (se os peixes boquejarem na superfície, aumente a aeração ou troque parte da água).
+- Monitore oxigenação pela manhã (se os peixes boquejarem na superfície, aumente a aeração).
 
 #### Abelhas Nativas (Jataí, Mandaçaia):
-- Posicione as caixas a meia-sombra, protegidas de vento sul e formigas (use graxa no suporte).
-- Plantio de flores melíferas ao redor (manjericão, assa-peixe, girassol, cosmo).`;
+- Posicione as caixas a meia-sombra, protegidas de vento sul e formigas.
+- Plantio de flores melíferas ao redor (manjericão, assa-peixe, girassol).`;
   }
 
-  // 8. Resposta Agronômica Geral Inteligente
+  // 10. Resposta Agronômica Geral Inteligente
   return `### 🌾 Consultoria RoçaCtrl: ${message}
 
 Para orientar você com máxima precisão sobre essa atividade no seu sítio:
@@ -178,9 +211,9 @@ Para orientar você com máxima precisão sobre essa atividade no seu sítio:
 2. **Registro e Rastreabilidade:**
    - Cadastre o lote no módulo **Animais** ou **Culturas** do RoçaCtrl para acompanhar o ciclo e custos de produção.
 3. **Dica Técnica:**
-   - Você pode cadastrar uma chave gratuita do **Google Gemini API** em *Configurações* ou no botão acima para habilitar respostas generativas personalizadas em tempo real!
+   - Você pode conectar uma chave gratuita do **Google Gemini API** no botão acima para desbloquear análises generativas ilimitadas!
 
-*Se quiser aprofundar sobre espaçamento, adubação, dosagens ou controle de pragas, pode perguntar!*`;
+*Se desejar orientações sobre dosagens, espaçamentos ou épocas de colheita, basta perguntar!*`;
 }
 
 // -------------------------------------------------------------

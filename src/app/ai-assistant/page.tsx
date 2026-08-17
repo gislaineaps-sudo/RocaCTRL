@@ -17,14 +17,16 @@ import {
   HelpCircle,
   Sprout,
   ShieldAlert,
-  Bot
+  Bot,
+  Droplets,
+  Bug,
+  LineChart as LineIcon
 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -38,11 +40,11 @@ type Message = {
 }
 
 const QUICK_PROMPTS = [
-  "Quais culturas são recomendadas para o Sudeste em agosto?",
-  "Como controlar pulgões e lagartas na horta orgânica?",
-  "Qual a quantidade diária de ração para galinhas poedeiras?",
-  "Como fazer biofertilizante líquido caseiro?",
-  "Dicas de rotação de culturas para canteiros pequenos"
+  { text: "Como combater lagartas em hortaliças de forma orgânica?", icon: Bug },
+  { text: "Qual a umidade ideal para o solo de milho nesta época?", icon: Droplets },
+  { text: "Resuma meus gastos e receitas deste mês.", icon: LineIcon },
+  { text: "Quais culturas são recomendadas para o Sudeste em agosto?", icon: Sprout },
+  { text: "Como melhorar a postura de ovos das galinhas caipiras?", icon: Sparkles }
 ]
 
 export default function AIAssistant() {
@@ -51,7 +53,7 @@ export default function AIAssistant() {
     {
       id: "initial",
       role: "assistant",
-      text: "Olá, produtor(a)! Sou o **Assistente Agro do RoçaCtrl**. Estou aqui para orientar sobre épocas de plantio, manejo de criações, adubação orgânica, controle agroecológico de pragas e planejamento do seu sítio. Como posso te ajudar hoje?"
+      text: "Olá, produtor(a)! Sou o **Assistente Agro do RoçaCtrl**. Estou aqui para orientar sobre épocas de plantio, manejo de criações, adubação orgânica, controle agroecológico de pragas e planejamento do seu sítio. Clique em uma das perguntas rápidas abaixo ou digite sua dúvida!"
     }
   ])
   const [inputValue, setInputValue] = useState("")
@@ -90,7 +92,7 @@ export default function AIAssistant() {
 
   const handleListen = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Seu navegador não suporta reconhecimento de voz.")
+      alert("Seu navegador não suporta reconhecimento de voz direto.")
       return
     }
 
@@ -135,7 +137,7 @@ export default function AIAssistant() {
       const errorMsg: Message = { 
         id: (Date.now() + 1).toString(), 
         role: "assistant", 
-        text: "Desculpe, ocorreu uma instabilidade na conexão. Tente perguntar novamente em instantes." 
+        text: "Desculpe, ocorreu uma instabilidade momentânea na conexão. Tente novamente em instantes." 
       }
       setMessages(prev => [...prev, errorMsg])
     } finally {
@@ -146,23 +148,23 @@ export default function AIAssistant() {
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       {/* Cabeçalho */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary flex items-center gap-2.5">
+          <h1 className="text-2xl md:text-3xl font-headline font-bold text-slate-900 flex items-center gap-2.5">
             <BrainCircuit className="h-7 w-7 text-primary" /> Consultor Agrônomo IA
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Dúvidas zootécnicas, botânicas, calendários de plantio e receitas agroecológicas.
+          <p className="text-sm text-slate-600 font-medium">
+            Orientações de plantio, manejo zootécnico, clima e agroecologia.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {apiKey ? (
-            <Badge className="bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/25 border-emerald-300 gap-1.5 py-1 px-3">
-              <Sparkles className="h-3.5 w-3.5" /> Gemini 2.5 Flash Ativo
+            <Badge className="bg-emerald-600/15 text-emerald-800 border-emerald-300 gap-1.5 py-1 px-3">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-600" /> Gemini 2.5 Flash Ativo
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-muted-foreground gap-1.5 py-1 px-3">
+            <Badge variant="outline" className="text-slate-700 border-slate-300 gap-1.5 py-1 px-3">
               <Bot className="h-3.5 w-3.5 text-primary" /> Base Agro Integrada
             </Badge>
           )}
@@ -171,7 +173,7 @@ export default function AIAssistant() {
             variant="outline"
             size="sm"
             onClick={() => setIsKeyDialogOpen(true)}
-            className="gap-1.5 text-xs h-8"
+            className="gap-1.5 text-xs h-10 border-slate-300 text-slate-800 hover:bg-slate-50 font-semibold"
           >
             <Key className="h-3.5 w-3.5 text-primary" />
             {apiKey ? "Alterar Chave" : "Conectar Chave Gemini"}
@@ -180,7 +182,7 @@ export default function AIAssistant() {
       </div>
 
       {/* Caixa de Mensagens */}
-      <Card className="border shadow-sm flex flex-col h-[520px]">
+      <Card className="border border-slate-200 shadow-sm flex flex-col h-[520px]">
         <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((m) => (
             <div
@@ -188,7 +190,7 @@ export default function AIAssistant() {
               className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {m.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1 border border-primary/20">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-1 border border-primary/20 shadow-2xs">
                   <BrainCircuit className="h-4 w-4" />
                 </div>
               )}
@@ -196,15 +198,15 @@ export default function AIAssistant() {
               <div
                 className={`rounded-2xl px-4 py-3 max-w-[85%] text-sm leading-relaxed whitespace-pre-wrap ${
                   m.role === 'user'
-                    ? 'bg-primary text-white shadow-xs rounded-tr-xs'
-                    : 'bg-card border border-border/80 shadow-xs rounded-tl-xs text-foreground prose-sm max-w-none'
+                    ? 'bg-primary text-white shadow-xs rounded-tr-xs font-medium'
+                    : 'bg-white border border-slate-200 shadow-xs rounded-tl-xs text-slate-900 prose-sm max-w-none'
                 }`}
               >
                 {m.text}
               </div>
 
               {m.role === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0 mt-1 shadow-xs">
+                <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 mt-1 shadow-xs">
                   <User className="h-4 w-4" />
                 </div>
               )}
@@ -213,37 +215,38 @@ export default function AIAssistant() {
 
           {loading && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
+              <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
                 <BrainCircuit className="h-4 w-4" />
               </div>
-              <div className="bg-muted/50 border rounded-2xl px-4 py-3 rounded-tl-xs flex items-center gap-2 text-muted-foreground text-sm">
+              <div className="bg-slate-100 border border-slate-200 rounded-2xl px-4 py-3 rounded-tl-xs flex items-center gap-2 text-slate-700 text-sm font-medium">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                <span>Analisando recomendações agronômicas...</span>
+                <span>Consultando recomendações agronômicas...</span>
               </div>
             </div>
           )}
           <div ref={chatEndRef} />
         </CardContent>
 
-        {/* Sugestões Rápidas */}
-        <div className="px-4 py-2 bg-muted/20 border-t flex items-center gap-2 overflow-x-auto text-xs pb-2">
-          <span className="text-muted-foreground font-medium shrink-0 flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-primary" /> Sugestões:
+        {/* CHIPS DE ATALHOS RÁPIDOS PARA O PRODUTOR */}
+        <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center gap-2 overflow-x-auto text-xs">
+          <span className="text-slate-700 font-bold shrink-0 flex items-center gap-1">
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Atalhos Rápidos:
           </span>
-          {QUICK_PROMPTS.map((promptText, i) => (
+          {QUICK_PROMPTS.map((item, i) => (
             <button
               key={i}
-              onClick={() => handleSendMessage(promptText)}
+              onClick={() => handleSendMessage(item.text)}
               disabled={loading}
-              className="bg-card border hover:border-primary/50 text-muted-foreground hover:text-primary px-3 py-1 rounded-full whitespace-nowrap transition-colors shrink-0 disabled:opacity-50"
+              className="bg-white border border-slate-300 hover:border-primary text-slate-800 hover:text-primary px-3.5 py-1.5 rounded-xl font-medium whitespace-nowrap transition-all shadow-2xs hover:shadow-xs shrink-0 disabled:opacity-50 flex items-center gap-1.5 active:scale-95"
             >
-              {promptText}
+              <item.icon className="h-3.5 w-3.5 text-primary" />
+              <span>{item.text}</span>
             </button>
           ))}
         </div>
 
         {/* Input de Mensagem */}
-        <div className="p-3 border-t bg-card">
+        <div className="p-3 border-t border-slate-200 bg-white">
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -255,28 +258,28 @@ export default function AIAssistant() {
               type="button"
               variant="outline"
               size="icon"
-              className={`shrink-0 rounded-full h-10 w-10 ${isListening ? 'bg-red-100 text-red-600 border-red-300 animate-pulse' : ''}`}
+              className={`shrink-0 rounded-2xl h-11 w-11 border-slate-300 ${isListening ? 'bg-rose-100 text-rose-600 border-rose-300 animate-pulse' : 'text-slate-700'}`}
               onClick={handleListen}
               title="Falar por voz"
             >
-              <Mic className="h-4 w-4" />
+              <Mic className="h-5 w-5" />
             </Button>
 
             <Input
-              placeholder="Digite sua dúvida sobre cultivo, animais, clima, adubação..."
+              placeholder="Digite sua dúvida sobre plantio, adubo, controle de pragas, rebanho..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               disabled={loading}
-              className="flex-1 rounded-full h-10 px-4 text-sm"
+              className="flex-1 rounded-xl h-11 px-4 text-sm border-slate-300 text-slate-900"
             />
 
             <Button
               type="submit"
               size="icon"
               disabled={loading || !inputValue.trim()}
-              className="shrink-0 rounded-full h-10 w-10 bg-primary hover:bg-primary/90 text-white shadow-xs"
+              className="shrink-0 rounded-2xl h-11 w-11 bg-primary hover:bg-primary/90 text-white shadow-xs"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             </Button>
           </form>
         </div>
@@ -284,44 +287,45 @@ export default function AIAssistant() {
 
       {/* Modal de Conectar Chave do Google Gemini */}
       <Dialog open={isKeyDialogOpen} onOpenChange={setIsKeyDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg font-headline">
+            <DialogTitle className="flex items-center gap-2 text-lg font-headline font-bold text-slate-900">
               <Key className="h-5 w-5 text-primary" /> Chave Google Gemini API
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
               Ao adicionar sua chave de API do <strong>Google AI Studio</strong> (100% gratuita), o RoçaCtrl desbloqueia o modelo <strong>Gemini 2.5 Flash</strong> com respostas generativas sob medida para qualquer contexto do seu sítio.
             </p>
 
             <div className="space-y-1.5">
-              <Label htmlFor="gemini-key">Sua API Key do Google Gemini</Label>
+              <Label htmlFor="gemini-key" className="text-xs font-bold text-slate-800">Sua API Key do Google Gemini</Label>
               <Input
                 id="gemini-key"
                 type="password"
                 placeholder="AIzaSy..."
                 value={tempKey}
                 onChange={(e) => setTempKey(e.target.value)}
+                className="h-11 font-mono text-sm border-slate-300"
               />
             </div>
 
-            <div className="p-3 bg-primary/5 rounded-lg border border-primary/10 text-[11px] text-muted-foreground space-y-1">
-              <p className="font-semibold text-primary">Como obter uma chave gratuita:</p>
-              <ol className="list-decimal pl-4 space-y-0.5">
-                <li>Acesse <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-primary underline">aistudio.google.com/apikey</a></li>
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-slate-700 space-y-1">
+              <p className="font-bold text-emerald-800">Como obter sua chave gratuita em 1 minuto:</p>
+              <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                <li>Acesse <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-primary font-bold underline">aistudio.google.com/apikey</a></li>
                 <li>Faça login com sua conta Google e clique em <em>Create API key</em></li>
                 <li>Copie e cole sua chave no campo acima.</li>
               </ol>
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setIsKeyDialogOpen(false)}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsKeyDialogOpen(false)} className="h-11">
               Cancelar
             </Button>
-            <Button onClick={handleSaveApiKey} className="bg-primary hover:bg-primary/90">
+            <Button onClick={handleSaveApiKey} className="h-11 bg-primary hover:bg-primary/90 text-white font-bold">
               Salvar Chave
             </Button>
           </DialogFooter>
