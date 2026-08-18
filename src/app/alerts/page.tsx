@@ -230,13 +230,25 @@ export default function AlertsPage() {
                     <Label htmlFor="task-category" className="text-xs">Categoria</Label>
                     <select
                       id="task-category"
-                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      className="flex h-9 w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 font-medium"
                       value={newTaskCategory}
                       onChange={(e) => setNewTaskCategory(e.target.value)}
                     >
-                      {categories.map(c => (
-                        <option key={c.id} value={c.name}>{c.name}</option>
-                      ))}
+                      <optgroup label="🌳 Culturas & Vegetação">
+                        {categories.filter(c => c.type === 'PLANT').map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="🐔 Animais & Criações">
+                        {categories.filter(c => c.type === 'ANIMAL').map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="🚜 Infraestrutura & Geral">
+                        {categories.filter(c => c.type === 'INFRASTRUCTURE' || c.type === 'FINANCIAL').map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </optgroup>
                     </select>
                   </div>
 

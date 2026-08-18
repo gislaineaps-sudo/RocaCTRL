@@ -20,7 +20,8 @@ import {
   Sprout,
   CheckCircle2,
   Clock,
-  Cherry
+  Cherry,
+  TreeDeciduous
 } from "lucide-react"
 import {
   Dialog,
@@ -53,6 +54,9 @@ export default function CropsPage() {
   const [selectedType, setSelectedType] = useState<string>("all")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
 
+  // FILTRAGEM ESTRITA: APENAS CATEGORIAS DE PLANTIO / VEGETAÇÃO (type === 'PLANT')
+  const plantCategories = categories.filter(c => c.type === 'PLANT' || (!c.type && c.sector === 'Culturas'))
+
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -80,9 +84,6 @@ export default function CropsPage() {
     notes: ""
   })
 
-  // Categorias de cultivo disponíveis no banco
-  const cropCategories = categories.filter(c => c.sector === "Culturas" || c.sector === "Geral")
-
   const filteredCrops = crops.filter(crop => {
     const matchesType = selectedType === "all" || crop.type === selectedType
     const matchesCategory = selectedCategory === "all" || crop.category === selectedCategory
@@ -94,7 +95,7 @@ export default function CropsPage() {
   })
 
   const handleOpenDialog = (crop?: CropItem) => {
-    const defaultCat = cropCategories[0]?.name || "Hortaliças e Folhosas"
+    const defaultCat = plantCategories[0]?.name || "🥬 Hortaliças e Folhosas"
     if (crop) {
       setEditingId(crop.id)
       setFormData({
@@ -141,7 +142,7 @@ export default function CropsPage() {
       id: editingId || undefined,
       name: formData.name.trim(),
       type: formData.type,
-      category: formData.category || cropCategories[0]?.name || "Culturas",
+      category: formData.category || plantCategories[0]?.name || "🥬 Hortaliças e Folhosas",
       stage: formData.stage,
       progress: Number(formData.progress),
       area: formData.area.trim(),
@@ -190,12 +191,12 @@ export default function CropsPage() {
     switch (health) {
       case "Excelente":
       case "Ótimo":
-        return <Badge className="bg-emerald-600/15 text-emerald-700 hover:bg-emerald-600/25 border-emerald-300">{health}</Badge>
+        return <Badge className="bg-emerald-600/15 text-emerald-800 border-emerald-300">{health}</Badge>
       case "Saudável":
-        return <Badge className="bg-lime-600/15 text-lime-700 hover:bg-lime-600/25 border-lime-300">Saudável</Badge>
+        return <Badge className="bg-lime-600/15 text-lime-800 border-lime-300">Saudável</Badge>
       case "Observação":
       case "Atenção":
-        return <Badge className="bg-amber-600/15 text-amber-700 hover:bg-amber-600/25 border-amber-300">{health}</Badge>
+        return <Badge className="bg-amber-600/15 text-amber-800 border-amber-300">{health}</Badge>
       default:
         return <Badge variant="outline">{health}</Badge>
     }
@@ -206,19 +207,19 @@ export default function CropsPage() {
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary flex items-center gap-3">
+          <h1 className="text-3xl font-headline font-bold text-slate-900 flex items-center gap-3">
             <Sprout className="h-8 w-8 text-primary" /> Culturas, Hortas e Pomares
           </h1>
-          <p className="text-muted-foreground">
-            Acompanhamento de canteiros, estágios fenológicos, áreas de plantio e previsão de colheita.
+          <p className="text-slate-600 font-medium">
+            Acompanhamento fenológico de canteiros, árvores frutíferas, lavouras e previsão de safra.
           </p>
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} className="h-10 text-xs gap-2 border-slate-300 text-slate-800 hover:bg-slate-50 font-semibold">
             <Download className="h-4 w-4" /> Exportar CSV
           </Button>
-          <Button onClick={() => handleOpenDialog()} className="bg-primary hover:bg-primary/90 gap-2">
+          <Button onClick={() => handleOpenDialog()} className="h-10 px-4 bg-primary hover:bg-primary/90 text-white font-bold gap-2 shadow-xs">
             <Plus className="h-4 w-4" /> Novo Canteiro / Pomar
           </Button>
         </div>
@@ -226,80 +227,80 @@ export default function CropsPage() {
 
       {/* Métricas Rápidas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-slate-200">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground font-medium">Cultivos Ativos</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{crops.length}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Canteiros e parcelas</p>
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider">Cultivos Ativos</p>
+            <p className="text-2xl font-bold text-slate-900 mt-1">{crops.length}</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Canteiros e parcelas</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-slate-200">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground font-medium">Prontos / Em Colheita</p>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider">Prontos / Em Colheita</p>
+            <p className="text-2xl font-bold text-emerald-700 mt-1">
               {crops.filter(c => c.stage === "Colheita Contínua" || c.progress >= 85).length}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Disponíveis para colheita</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Disponíveis para colheita</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-slate-200">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground font-medium">Em Desenvolvimento</p>
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider">Em Desenvolvimento</p>
             <p className="text-2xl font-bold text-primary mt-1">
               {crops.filter(c => c.stage === "Desenvolvimento" || c.stage === "Floração").length}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Em fase de crescimento</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Em fase de crescimento</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-slate-200">
           <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground font-medium">Categorias Vinculadas</p>
+            <p className="text-xs text-slate-600 font-bold uppercase tracking-wider">Categorias de Plantio</p>
             <p className="text-2xl font-bold text-amber-600 mt-1">
               {new Set(crops.map(c => c.category || c.type)).size}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Variedades no sítio</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">Espécies e tipos no sítio</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Busca e Filtros */}
-      <Card>
+      <Card className="border-slate-200">
         <CardContent className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               placeholder="Buscar canteiro, fruta ou legume..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-11 border-slate-300 text-sm text-slate-900"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground shrink-0">Tipo:</span>
+              <span className="text-xs font-bold text-slate-700 shrink-0">Tipo:</span>
               <select
-                className="h-9 rounded-md border border-input bg-background px-2.5 py-1 text-xs"
+                className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs font-medium text-slate-800"
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
               >
                 <option value="all">Todos os Tipos</option>
-                <option value="Horta">Horta</option>
-                <option value="Pomar">Pomar</option>
+                <option value="Horta">Horta (Verduras/Legumes)</option>
+                <option value="Pomar">Pomar (Frutíferas)</option>
                 <option value="Ervas">Ervas / Medicinais</option>
                 <option value="Lavoura">Lavoura / Grãos</option>
               </select>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-muted-foreground shrink-0">Categoria:</span>
+              <span className="text-xs font-bold text-slate-700 shrink-0">Categoria de Plantio:</span>
               <select
-                className="h-9 rounded-md border border-input bg-background px-2.5 py-1 text-xs"
+                className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs font-medium text-slate-800"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
-                <option value="all">Todas as Categorias</option>
-                {categories.map(cat => (
+                <option value="all">Todas as Categorias de Plantio</option>
+                {plantCategories.map(cat => (
                   <option key={cat.id} value={cat.name}>{cat.name}</option>
                 ))}
               </select>
@@ -311,61 +312,61 @@ export default function CropsPage() {
       {/* Grid de Cultivos */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredCrops.length === 0 ? (
-          <div className="col-span-full text-center py-12 bg-card rounded-xl border border-dashed text-muted-foreground">
+          <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300 text-slate-500">
             <Leaf className="h-10 w-10 mx-auto opacity-30 mb-2" />
-            <p className="text-base font-medium">Nenhum cultivo encontrado.</p>
-            <p className="text-xs text-muted-foreground mt-1">Adicione um novo canteiro no botão acima.</p>
+            <p className="text-base font-bold text-slate-700">Nenhum cultivo encontrado.</p>
+            <p className="text-xs text-slate-500 mt-1">Adicione um novo canteiro no botão acima.</p>
           </div>
         ) : (
           filteredCrops.map((crop) => (
-            <Card key={crop.id} className="hover:shadow-md transition-shadow relative overflow-hidden">
+            <Card key={crop.id} className="hover:shadow-md transition-shadow relative overflow-hidden border-slate-200">
               <div className="p-5 space-y-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-primary uppercase tracking-wider">{crop.type}</span>
-                      <span className="text-muted-foreground text-xs">•</span>
-                      <span className="text-xs text-muted-foreground">{crop.category || "Geral"}</span>
+                      <span className="text-xs font-bold text-primary uppercase tracking-wider">{crop.type}</span>
+                      <span className="text-slate-400 text-xs">•</span>
+                      <span className="text-xs font-medium text-slate-600">{crop.category || "Geral"}</span>
                     </div>
-                    <h3 className="text-lg font-bold text-foreground mt-1">{crop.name}</h3>
+                    <h3 className="text-lg font-bold text-slate-900 mt-1">{crop.name}</h3>
                   </div>
                   {getHealthBadge(crop.health)}
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs font-medium">
-                    <span className="text-muted-foreground">Estágio: {crop.stage}</span>
+                    <span className="text-slate-600">Estágio: {crop.stage}</span>
                     <span className="font-bold text-primary">{crop.progress}%</span>
                   </div>
-                  <Progress value={crop.progress} className="h-2" />
+                  <Progress value={crop.progress} className="h-2.5" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-border/50 bg-muted/20 -mx-5 px-5">
+                <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-slate-100 bg-slate-50 -mx-5 px-5">
                   <div>
-                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Área / Tamanho</span>
-                    <span className="font-semibold text-foreground">{crop.area}</span>
+                    <span className="text-slate-500 block text-[10px] uppercase font-bold">Área / Tamanho</span>
+                    <span className="font-bold text-slate-800">{crop.area}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Previsão Colheita</span>
-                    <span className="font-medium text-emerald-700">{crop.expectedHarvest || "Em breve"}</span>
+                    <span className="text-slate-500 block text-[10px] uppercase font-bold">Previsão Colheita</span>
+                    <span className="font-bold text-emerald-800">{crop.expectedHarvest || "Em breve"}</span>
                   </div>
                 </div>
 
                 {crop.notes && (
-                  <p className="text-xs text-muted-foreground bg-muted/40 p-2.5 rounded-md italic">
+                  <p className="text-xs text-slate-700 bg-slate-100 p-2.5 rounded-lg italic">
                     "{crop.notes}"
                   </p>
                 )}
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Calendar className="h-3 w-3" /> Plantado em: {crop.plantedDate}
+                  <span className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400" /> Plantio: {crop.plantedDate}
                   </span>
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      className="h-9 w-9 text-slate-600 hover:text-primary hover:bg-primary/10"
                       onClick={() => handleOpenDialog(crop)}
                       title="Editar Cultivo"
                     >
@@ -374,7 +375,7 @@ export default function CropsPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      className="h-9 w-9 text-slate-600 hover:text-rose-600 hover:bg-rose-50"
                       onClick={() => handleDelete(crop)}
                       title="Excluir Cultivo"
                     >
@@ -388,33 +389,34 @@ export default function CropsPage() {
         )}
       </div>
 
-      {/* Modal Dialog para Cadastro/Edição */}
+      {/* Modal Dialog para Cadastro/Edição de Plantios */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-xl font-headline font-bold text-slate-900">
               <Sprout className="h-5 w-5 text-primary" />
-              {editingId ? "Editar Cultivo / Canteiro" : "Novo Cultivo / Canteiro"}
+              {editingId ? "Editar Cultivo / Canteiro" : "Novo Plantio / Canteiro"}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="crop-name">Nome do Canteiro / Plantação *</Label>
+              <Label htmlFor="crop-name" className="text-xs font-bold text-slate-800">Nome do Canteiro / Plantação *</Label>
               <Input
                 id="crop-name"
                 placeholder="Ex: Canteiro Alface Roxa, Pomar Laranjeiras..."
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="h-11 border-slate-300 text-sm"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="crop-type">Tipo de Cultivo</Label>
+                <Label htmlFor="crop-type" className="text-xs font-bold text-slate-800">Tipo de Cultivo</Label>
                 <select
                   id="crop-type"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 >
@@ -426,16 +428,19 @@ export default function CropsPage() {
                 </select>
               </div>
 
+              {/* SELETOR ESTRITO: EXIBE APENAS CATEGORIAS DO TIPO PLANT */}
               <div className="space-y-1.5">
-                <Label htmlFor="crop-category">Categoria (Banco Dinâmico)</Label>
+                <Label htmlFor="crop-category" className="text-xs font-bold text-slate-800">
+                  Categoria de Vegetação *
+                </Label>
                 <select
                   id="crop-category"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.name}>{cat.name} ({cat.sector})</option>
+                  {plantCategories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -443,20 +448,21 @@ export default function CropsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="crop-area">Área / Tamanho Ocupado *</Label>
+                <Label htmlFor="crop-area" className="text-xs font-bold text-slate-800">Área / Tamanho Ocupado *</Label>
                 <Input
                   id="crop-area"
-                  placeholder="Ex: 25 m², 10 árvores, 2 canteiros"
+                  placeholder="Ex: 25 m², 12 árvores, 2 canteiros"
                   value={formData.area}
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="crop-stage">Estágio Fenológico</Label>
+                <Label htmlFor="crop-stage" className="text-xs font-bold text-slate-800">Estágio Fenológico</Label>
                 <select
                   id="crop-stage"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
                   value={formData.stage}
                   onChange={(e) => setFormData({ ...formData, stage: e.target.value as any })}
                 >
@@ -468,7 +474,7 @@ export default function CropsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex justify-between text-xs font-medium">
+              <div className="flex justify-between text-xs font-bold text-slate-800">
                 <Label htmlFor="crop-progress">Progresso do Ciclo</Label>
                 <span className="font-bold text-primary">{formData.progress}%</span>
               </div>
@@ -479,38 +485,40 @@ export default function CropsPage() {
                 max="100"
                 value={formData.progress}
                 onChange={(e) => setFormData({ ...formData, progress: Number(e.target.value) })}
-                className="w-full cursor-pointer accent-primary"
+                className="w-full cursor-pointer accent-primary h-2 bg-slate-200 rounded-lg"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="crop-planted">Data de Plantio</Label>
+                <Label htmlFor="crop-planted" className="text-xs font-bold text-slate-800">Data de Plantio</Label>
                 <Input
                   id="crop-planted"
                   type="date"
                   value={formData.plantedDate}
                   onChange={(e) => setFormData({ ...formData, plantedDate: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="crop-harvest">Previsão de Colheita</Label>
+                <Label htmlFor="crop-harvest" className="text-xs font-bold text-slate-800">Previsão de Colheita</Label>
                 <Input
                   id="crop-harvest"
-                  placeholder="Ex: 2026-05-15 ou Contínua"
+                  placeholder="Ex: 2026-05-15 ou Colheita Semanal"
                   value={formData.expectedHarvest}
                   onChange={(e) => setFormData({ ...formData, expectedHarvest: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="crop-health">Vigor / Saúde</Label>
+                <Label htmlFor="crop-health" className="text-xs font-bold text-slate-800">Vigor / Saúde</Label>
                 <select
                   id="crop-health"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
                   value={formData.health}
                   onChange={(e) => setFormData({ ...formData, health: e.target.value as any })}
                 >
@@ -523,22 +531,23 @@ export default function CropsPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="crop-notes">Observações e Manejo</Label>
+                <Label htmlFor="crop-notes" className="text-xs font-bold text-slate-800">Observações e Manejo</Label>
                 <Input
                   id="crop-notes"
-                  placeholder="Ex: Irrigação gotejamento, adubação..."
+                  placeholder="Ex: Irrigação gotejamento, adubação orgânica..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="h-11">
               Cancelar
             </Button>
-            <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+            <Button onClick={handleSave} className="h-11 bg-primary hover:bg-primary/90 text-white font-bold px-5">
               Salvar Cultivo
             </Button>
           </DialogFooter>

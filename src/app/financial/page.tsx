@@ -544,16 +544,33 @@ export default function FinancialPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="tx-category">Categoria</Label>
-                <select
-                  id="tx-category"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                >
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
-                  ))}
-                </select>
+                  <select
+                    id="tx-category"
+                    className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  >
+                    <optgroup label="💰 Financeiro e Custos">
+                      {categories.filter(c => c.type === 'FINANCIAL').map(cat => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="🌳 Culturas & Vegetação">
+                      {categories.filter(c => c.type === 'PLANT').map(cat => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="🐔 Animais & Criações">
+                      {categories.filter(c => c.type === 'ANIMAL').map(cat => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="🚜 Infraestrutura">
+                      {categories.filter(c => c.type === 'INFRASTRUCTURE').map(cat => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))}
+                    </optgroup>
+                  </select>
               </div>
 
               <div className="space-y-1.5">
