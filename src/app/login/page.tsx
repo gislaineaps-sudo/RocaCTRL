@@ -25,16 +25,40 @@ import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth()
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } = useAuth()
   const { toast } = useToast()
 
   const [mode, setMode] = useState<"login" | "register">("login")
   const [loading, setLoading] = useState(false)
 
   const [name, setName] = useState("")
-  const [farmName, setFarmName] = useState("Minha Chácara")
+  const [farmName, setFarmName] = useState("Meu Sítio")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      toast({
+        title: "Informe seu e-mail primeiro",
+        description: "Digite seu e-mail no campo acima e clique em 'Esqueci minha senha'.",
+        variant: "destructive",
+      })
+      return
+    }
+    try {
+      await resetPassword(email)
+      toast({
+        title: "E-mail de recuperação enviado! 📩",
+        description: `Enviamos um link para redefinir sua senha em ${email.trim()}.`,
+      })
+    } catch (error: any) {
+      toast({
+        title: "Erro ao recuperar senha",
+        description: error?.message || "Verifique o e-mail informado e tente novamente.",
+        variant: "destructive",
+      })
+    }
+  }
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
@@ -246,9 +270,20 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="login-pass" className="text-xs font-bold text-slate-900">
-                  Senha *
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="login-pass" className="text-xs font-bold text-slate-900">
+                    Senha *
+                  </Label>
+                  {mode === "login" && (
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-xs font-bold text-emerald-800 hover:underline"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  )}
+                </div>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                   <Input

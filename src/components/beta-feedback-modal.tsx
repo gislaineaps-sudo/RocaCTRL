@@ -33,12 +33,14 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
 
   const persistFeedback = () => {
     const saved = RocaDB.saveFeedback({
+      userId: user?.uid || "demo",
       uid: user?.uid || "demo",
       userName: userName.trim() || user?.name || "Produtor(a)",
-      userEmail: user?.email,
-      farmName: user?.farmName || "Minha Chácara",
+      userEmail: user?.email || "visitante@rocactrl.com.br",
+      farmName: user?.farmName || "Meu Sítio",
       type: feedbackType,
       message: message.trim() || "Contato via botão de suporte Beta",
+      status: "pending",
     })
     if (isFirebaseConfigured && db) {
       setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
@@ -179,6 +181,16 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
               onChange={(e) => setMessage(e.target.value)}
               className="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
             />
+          </div>
+
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex flex-col gap-0.5">
+            <span className="font-bold text-slate-900">Canal Oficial de Suporte Direto:</span>
+            <a
+              href="mailto:suporte.rocactrl@gmail.com"
+              className="font-mono font-bold text-emerald-800 hover:underline"
+            >
+              suporte.rocactrl@gmail.com
+            </a>
           </div>
         </div>
 

@@ -22,13 +22,14 @@ export interface UserProfile {
 
 export interface FeedbackItem {
   id: string
+  userId?: string
   uid?: string
   userName: string
   userEmail?: string
   farmName?: string
   type: "sugestao" | "problema" | "duvida"
   message: string
-  status: "Pendente" | "Lido"
+  status: "pending" | "resolved" | "Pendente" | "Resolvido" | "Lido"
   createdAt: string
 }
 
@@ -348,24 +349,26 @@ export const SEED_USERS: UserProfile[] = [
 export const SEED_FEEDBACKS: FeedbackItem[] = [
   {
     id: "FB-101",
+    userId: "usr-prod-2",
     uid: "usr-prod-2",
     userName: "Seu Antônio Oliveira",
     userEmail: "antonio.chacara@gmail.com",
     farmName: "Chácara São José",
     type: "sugestao",
     message: "Adorei o seletor de Maço e Caixa nas colheitas! Facilitou muito na hora de fechar as vendas da feira de sábado.",
-    status: "Lido",
+    status: "resolved",
     createdAt: "2026-04-15"
   },
   {
     id: "FB-102",
+    userId: "usr-prod-3",
     uid: "usr-prod-3",
     userName: "Maria Aparecida Santos",
     userEmail: "maria.horta@gmail.com",
     farmName: "Recanto das Hortaliças",
     type: "duvida",
     message: "Como faço para conectar o sensor de umidade do solo no plano Sítio Conectado?",
-    status: "Pendente",
+    status: "pending",
     createdAt: "2026-04-16"
   }
 ]
@@ -638,17 +641,18 @@ export const RocaDB = {
   setFeedbacksCache(feedbacks: FeedbackItem[]): void {
     setStoredData(GLOBAL_KEYS.FEEDBACKS, feedbacks)
   },
-  saveFeedback(fb: Omit<FeedbackItem, "id" | "createdAt" | "status"> & { id?: string; status?: "Pendente" | "Lido" }): FeedbackItem {
+  saveFeedback(fb: Omit<FeedbackItem, "id" | "createdAt" | "status"> & { id?: string; status?: FeedbackItem["status"] }): FeedbackItem {
     const feedbacks = this.getFeedbacks()
     const newFb: FeedbackItem = {
       id: fb.id || `FB-${Math.floor(100 + Math.random() * 900)}`,
-      uid: fb.uid,
+      userId: fb.userId || fb.uid || "demo",
+      uid: fb.uid || fb.userId || "demo",
       userName: fb.userName || "Produtor(a)",
-      userEmail: fb.userEmail,
-      farmName: fb.farmName || "Minha Chácara",
+      userEmail: fb.userEmail || "",
+      farmName: fb.farmName || "Meu Sítio",
       type: fb.type,
       message: fb.message,
-      status: fb.status || "Pendente",
+      status: fb.status || "pending",
       createdAt: new Date().toISOString().split("T")[0],
     }
     setStoredData(GLOBAL_KEYS.FEEDBACKS, [newFb, ...feedbacks])
@@ -658,7 +662,9 @@ export const RocaDB = {
     const feedbacks = this.getFeedbacks()
     const idx = feedbacks.findIndex(f => f.id === id)
     if (idx >= 0) {
-      feedbacks[idx].status = feedbacks[idx].status === "Lido" ? "Pendente" : "Lido"
+      const current = feedbacks[idx].status
+      const isResolved = current === "resolved" || current === "Resolvido" || current === "Lido"
+      feedbacks[idx].status = isResolved ? "pending" : "resolved"
       setStoredData(GLOBAL_KEYS.FEEDBACKS, feedbacks)
       return feedbacks[idx]
     }

@@ -231,7 +231,12 @@ export default function AdminDashboardPage() {
             </div>
             <p className="text-3xl font-bold text-slate-900 mt-2">{feedbacks.length}</p>
             <p className="text-xs text-slate-500 mt-0.5">
-              {feedbacks.filter((f) => f.status === "Pendente").length} aguardando leitura
+              {
+                feedbacks.filter(
+                  (f) => f.status === "pending" || f.status === "Pendente"
+                ).length
+              }{" "}
+              aguardando resolução
             </p>
           </CardContent>
         </Card>
@@ -332,61 +337,70 @@ export default function AdminDashboardPage() {
                 Nenhum feedback registrado até o momento.
               </p>
             ) : (
-              feedbacks.map((fb) => (
-                <div
-                  key={fb.id}
-                  className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                    fb.status === "Pendente"
-                      ? "border-amber-300 bg-amber-50/40"
-                      : "border-slate-200 bg-white"
-                  }`}
-                >
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        className={
-                          fb.type === "problema"
-                            ? "bg-rose-600/15 text-rose-800 border-rose-300 text-[10px]"
+              feedbacks.map((fb) => {
+                const isResolved =
+                  fb.status === "resolved" ||
+                  fb.status === "Resolvido" ||
+                  fb.status === "Lido"
+                return (
+                  <div
+                    key={fb.id}
+                    className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                      !isResolved
+                        ? "border-amber-300 bg-amber-50/40"
+                        : "border-slate-200 bg-white"
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          className={
+                            fb.type === "problema"
+                              ? "bg-rose-600/15 text-rose-800 border-rose-300 text-[10px]"
+                              : fb.type === "sugestao"
+                              ? "bg-emerald-600/15 text-emerald-800 border-emerald-300 text-[10px]"
+                              : "bg-blue-600/15 text-blue-800 border-blue-300 text-[10px]"
+                          }
+                        >
+                          {fb.type === "problema"
+                            ? "🐞 Problema"
                             : fb.type === "sugestao"
-                            ? "bg-emerald-600/15 text-emerald-800 border-emerald-300 text-[10px]"
-                            : "bg-blue-600/15 text-blue-800 border-blue-300 text-[10px]"
-                        }
-                      >
-                        {fb.type === "problema"
-                          ? "🐞 Problema"
-                          : fb.type === "sugestao"
-                          ? "💡 Sugestão"
-                          : "❓ Dúvida"}
-                      </Badge>
-                      <span className="text-sm font-bold text-slate-900">{fb.userName}</span>
-                      <span className="text-xs text-slate-500">• {fb.farmName || "Propriedade"}</span>
-                      <span className="text-[11px] font-mono text-slate-400">({fb.createdAt})</span>
+                            ? "💡 Sugestão"
+                            : "❓ Dúvida"}
+                        </Badge>
+                        <span className="text-sm font-bold text-slate-900">{fb.userName}</span>
+                        {fb.userEmail && (
+                          <span className="text-xs font-mono text-slate-600">({fb.userEmail})</span>
+                        )}
+                        <span className="text-xs text-slate-500">• {fb.farmName || "Meu Sítio"}</span>
+                        <span className="text-[11px] font-mono text-slate-400">({fb.createdAt})</span>
+                      </div>
+                      <p className="text-xs text-slate-800 leading-relaxed pt-1 font-medium">
+                        "{fb.message}"
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-800 leading-relaxed pt-1 font-medium">
-                      "{fb.message}"
-                    </p>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleFeedbackStatus(fb.id)}
-                      className="h-9 text-xs gap-1.5 border-slate-300"
-                    >
-                      {fb.status === "Lido" ? (
-                        <>
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Lido
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="h-3.5 w-3.5 text-amber-600" /> Marcar como Lido
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => toggleFeedbackStatus(fb.id)}
+                        className="h-9 text-xs gap-1.5 border-slate-300"
+                      >
+                        {isResolved ? (
+                          <>
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Resolvido
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-3.5 w-3.5 text-amber-600" /> Marcar como Resolvido
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </CardContent>

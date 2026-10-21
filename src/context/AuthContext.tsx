@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   updateProfile,
   signOut as firebaseSignOut,
 } from "firebase/auth"
@@ -36,6 +37,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<void>
   signUpWithEmail: (name: string, email: string, password: string, farmName?: string) => Promise<void>
+  resetPassword: (email: string) => Promise<void>
   signOut: () => Promise<void>
   updateCurrentUserPlan: (plan: PlanType) => Promise<void>
 }
@@ -125,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: "demo",
             name: "Produtor(a) Visitante",
             email: "visitante@rocactrl.com.br",
-            farmName: "Minha Chácara",
+            farmName: "Meu Sítio",
             plan: "free",
             role: "user",
             createdAt: new Date().toISOString().split("T")[0],
@@ -147,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             uid: fbUser.uid,
             name: fbUser.displayName || fbUser.email?.split("@")[0] || "Produtor(a)",
             email: fbUser.email || "",
-            farmName: "Minha Chácara",
+            farmName: "Meu Sítio",
             plan: isAdmin ? "iot" : "free",
             role: isAdmin ? "admin" : "user",
             createdAt: new Date().toISOString().split("T")[0],
@@ -196,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: fbUser.uid,
         name: fbUser.displayName || "Produtor(a) Rural",
         email: fbUser.email || "",
-        farmName: "Minha Chácara",
+        farmName: "Meu Sítio",
         plan: isAdmin ? "iot" : "free",
         role: isAdmin ? "admin" : "user",
         createdAt: new Date().toISOString().split("T")[0],
@@ -218,7 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       uid: mockUid,
       name: "Gislaine (Conta Google)",
       email: defaultEmail,
-      farmName: "Minha Chácara Conectada",
+      farmName: "Meu Sítio",
       plan: isAdmin ? "iot" : "free",
       role: isAdmin ? "admin" : "user",
       createdAt: new Date().toISOString().split("T")[0],
@@ -240,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: fbUser.uid,
         name: fbUser.displayName || cleanEmail.split("@")[0],
         email: cleanEmail,
-        farmName: "Minha Chácara",
+        farmName: "Meu Sítio",
         plan: isAdmin ? "iot" : "free",
         role: isAdmin ? "admin" : "user",
         createdAt: new Date().toISOString().split("T")[0],
@@ -263,7 +265,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: `usr-${btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, "").slice(0, 10)}`,
           name: cleanEmail.split("@")[0],
           email: cleanEmail,
-          farmName: "Minha Chácara",
+          farmName: "Meu Sítio",
           plan: isAdmin ? "iot" : "free",
           role: isAdmin ? "admin" : "user",
           createdAt: new Date().toISOString().split("T")[0],
@@ -280,7 +282,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name: string,
     email: string,
     password: string,
-    farmName = "Minha Chácara"
+    farmName = "Meu Sítio"
   ) => {
     const cleanEmail = email.trim().toLowerCase()
     const isAdmin = checkIsAdminEmail(cleanEmail)
@@ -294,7 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         uid: cred.user.uid,
         name: name.trim() || cleanEmail.split("@")[0],
         email: cleanEmail,
-        farmName: farmName.trim() || "Minha Chácara",
+        farmName: farmName.trim() || "Meu Sítio",
         plan: isAdmin ? "iot" : "free",
         role: isAdmin ? "admin" : "user",
         createdAt: new Date().toISOString().split("T")[0],
@@ -314,7 +316,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       uid: newUid,
       name: name.trim() || cleanEmail.split("@")[0],
       email: cleanEmail,
-      farmName: farmName.trim() || "Minha Chácara",
+      farmName: farmName.trim() || "Meu Sítio",
       plan: isAdmin ? "iot" : "free",
       role: isAdmin ? "admin" : "user",
       createdAt: new Date().toISOString().split("T")[0],
@@ -324,6 +326,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     RocaDB.saveUser(profile)
     localStorage.setItem(LOCAL_AUTH_USER_KEY, JSON.stringify(profile))
     setUser(profile)
+  }
+
+  const resetPassword = async (email: string) => {
+    const cleanEmail = email.trim().toLowerCase()
+    if (!cleanEmail) {
+      throw new Error("Digite seu e-mail para receber o link de redefinição.")
+    }
+    if (isFirebaseConfigured && auth) {
+      await sendPasswordResetEmail(auth, cleanEmail)
+    }
   }
 
   const signOut = async () => {
@@ -369,6 +381,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGoogle,
         signInWithEmail,
         signUpWithEmail,
+        resetPassword,
         signOut,
         updateCurrentUserPlan,
       }}
