@@ -5,6 +5,9 @@
 
 export type CategoryType = 'PLANT' | 'ANIMAL' | 'FINANCIAL' | 'INFRASTRUCTURE'
 
+export const AGRO_UNITS = ["kg", "Maço", "Caixa", "Saca", "Dúzia", "Litro", "Unidade"] as const
+export type AgroUnit = typeof AGRO_UNITS[number]
+
 export interface CategoryItem {
   id: string
   name: string
@@ -40,6 +43,8 @@ export interface CropItem {
   stage: "Preparo de Solo" | "Plantio Inicial" | "Desenvolvimento" | "Floração" | "Frutificação" | "Colheita Contínua" | "Finalizado"
   progress: number
   area: string
+  unit?: string
+  estimatedYield?: string
   plantedDate: string
   expectedHarvest?: string
   health: "Excelente" | "Saudável" | "Ótimo" | "Observação" | "Atenção"
@@ -52,6 +57,8 @@ export interface TransactionItem {
   type: "receita" | "despesa"
   category: string
   amount: number
+  quantity?: number
+  unit?: string
   date: string
   relatedType?: "animal" | "crop" | "geral"
   relatedName?: string
@@ -261,21 +268,21 @@ export const SEED_ANIMALS: AnimalItem[] = [
 ]
 
 export const SEED_CROPS: CropItem[] = [
-  { id: "CRP-001", name: "Canteiro de Alface Crespa e Roxa", type: "Horta", category: "🥬 Hortaliças e Folhosas", stage: "Desenvolvimento", progress: 65, area: "20 m²", plantedDate: "2026-03-20", expectedHarvest: "2026-04-28", health: "Excelente", notes: "Irrigação por gotejamento conectada ao sensor IoT." },
-  { id: "CRP-002", name: "Limoeiros Siciliano e Taiti", type: "Pomar", category: "🌳 Árvores Frutíferas", stage: "Frutificação", progress: 85, area: "12 árvores", plantedDate: "2024-05-10", expectedHarvest: "2026-05-15", health: "Saudável", notes: "Boa carga de frutos, adubação com cinza e esterco realizada." },
-  { id: "CRP-003", name: "Canteiro Tomate Cereja Orgânico", type: "Horta", category: "🌽 Grãos e Legumes", stage: "Floração", progress: 55, area: "15 m²", plantedDate: "2026-03-10", expectedHarvest: "2026-05-20", health: "Ótimo", notes: "Tutoramento feito. Aplicação preventiva de calda bordalesa." },
-  { id: "CRP-004", name: "Ervas Finas e Medicinais", type: "Ervas", category: "🌿 Ervas e Medicinais", stage: "Colheita Contínua", progress: 100, area: "8 m²", plantedDate: "2025-11-01", expectedHarvest: "Colheita Semanal", health: "Excelente", notes: "Manjericão e alecrim com excelente aroma." },
-  { id: "CRP-005", name: "Milho Verde Caipira", type: "Lavoura", category: "🌽 Grãos e Legumes", stage: "Desenvolvimento", progress: 40, area: "400 m²", plantedDate: "2026-03-01", expectedHarvest: "2026-06-10", health: "Saudável", notes: "Primeira capina realizada com sucesso." },
-  { id: "CRP-006", name: "Bosque de Ipês e Nativas", type: "Pomar", category: "🌲 Árvores Nativas e Reflorestamento", stage: "Desenvolvimento", progress: 50, area: "500 m²", plantedDate: "2024-01-15", expectedHarvest: "Reflorestamento Contínuo", health: "Excelente", notes: "Mudas protegidas com coroamento e cobertura morta." }
+  { id: "CRP-001", name: "Canteiro de Alface Crespa e Roxa", type: "Horta", category: "🥬 Hortaliças e Folhosas", stage: "Desenvolvimento", progress: 65, area: "20 m²", unit: "Maço", plantedDate: "2026-03-20", expectedHarvest: "2026-04-28", health: "Excelente", notes: "Irrigação por gotejamento conectada ao sensor IoT." },
+  { id: "CRP-002", name: "Limoeiros Siciliano e Taiti", type: "Pomar", category: "🌳 Árvores Frutíferas", stage: "Frutificação", progress: 85, area: "12 árvores", unit: "Caixa", plantedDate: "2024-05-10", expectedHarvest: "2026-05-15", health: "Saudável", notes: "Boa carga de frutos, adubação com cinza e esterco realizada." },
+  { id: "CRP-003", name: "Canteiro Tomate Cereja Orgânico", type: "Horta", category: "🌽 Grãos e Legumes", stage: "Floração", progress: 55, area: "15 m²", unit: "kg", plantedDate: "2026-03-10", expectedHarvest: "2026-05-20", health: "Ótimo", notes: "Tutoramento feito. Aplicação preventiva de calda bordalesa." },
+  { id: "CRP-004", name: "Ervas Finas e Medicinais", type: "Ervas", category: "🌿 Ervas e Medicinais", stage: "Colheita Contínua", progress: 100, area: "8 m²", unit: "Maço", plantedDate: "2025-11-01", expectedHarvest: "Colheita Semanal", health: "Excelente", notes: "Manjericão e alecrim com excelente aroma." },
+  { id: "CRP-005", name: "Milho Verde Caipira", type: "Lavoura", category: "🌽 Grãos e Legumes", stage: "Desenvolvimento", progress: 40, area: "400 m²", unit: "Saca", plantedDate: "2026-03-01", expectedHarvest: "2026-06-10", health: "Saudável", notes: "Primeira capina realizada com sucesso." },
+  { id: "CRP-006", name: "Bosque de Ipês e Nativas", type: "Pomar", category: "🌲 Árvores Nativas e Reflorestamento", stage: "Desenvolvimento", progress: 50, area: "500 m²", unit: "Unidade", plantedDate: "2024-01-15", expectedHarvest: "Reflorestamento Contínuo", health: "Excelente", notes: "Mudas protegidas com coroamento e cobertura morta." }
 ]
 
 export const SEED_TRANSACTIONS: TransactionItem[] = [
-  { id: "TX-001", description: "Venda de Ovos Caipiras (15 dúzias)", type: "receita", category: "💰 Venda de Produtos Agro", amount: 225.00, date: "2026-04-12", relatedType: "animal", relatedName: "Lote Galinhas Poedeiras 01", paymentMethod: "Pix", status: "Concluído" },
-  { id: "TX-002", description: "Compra de Ração de Postura 50kg", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 135.00, date: "2026-04-10", relatedType: "animal", relatedName: "Lote Galinhas Poedeiras 01", paymentMethod: "Pix", status: "Concluído" },
-  { id: "TX-003", description: "Venda de Cestas de Hortaliças para Feira", type: "receita", category: "💰 Venda de Produtos Agro", amount: 480.00, date: "2026-04-11", relatedType: "crop", relatedName: "Canteiro de Alface", paymentMethod: "Dinheiro", status: "Concluído" },
-  { id: "TX-004", description: "Aquisição de Mangueiras de Irrigação Gotejamento", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 190.00, date: "2026-04-08", relatedType: "geral", relatedName: "Infraestrutura Sítio", paymentMethod: "Cartão", status: "Concluído" },
-  { id: "TX-005", description: "Venda de Mel de Abelha Jataí (4 frascos 250ml)", type: "receita", category: "💰 Venda de Produtos Agro", amount: 160.00, date: "2026-04-06", relatedType: "animal", relatedName: "Meliponário Jataí 01", paymentMethod: "Pix", status: "Concluído" },
-  { id: "TX-006", description: "Compra de Esterco Bovino Curtido (20 sacos)", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 180.00, date: "2026-04-04", relatedType: "crop", relatedName: "Horta Geral", paymentMethod: "Pix", status: "Concluído" }
+  { id: "TX-001", description: "Venda de Ovos Caipiras (15 dúzias)", type: "receita", category: "💰 Venda de Produtos Agro", amount: 225.00, quantity: 15, unit: "Dúzia", date: "2026-04-12", relatedType: "animal", relatedName: "Lote Galinhas Poedeiras 01", paymentMethod: "Pix", status: "Concluído" },
+  { id: "TX-002", description: "Compra de Ração de Postura 50kg", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 135.00, quantity: 50, unit: "kg", date: "2026-04-10", relatedType: "animal", relatedName: "Lote Galinhas Poedeiras 01", paymentMethod: "Pix", status: "Concluído" },
+  { id: "TX-003", description: "Venda de Cestas de Hortaliças para Feira", type: "receita", category: "💰 Venda de Produtos Agro", amount: 480.00, quantity: 40, unit: "Maço", date: "2026-04-11", relatedType: "crop", relatedName: "Canteiro de Alface", paymentMethod: "Dinheiro", status: "Concluído" },
+  { id: "TX-004", description: "Aquisição de Mangueiras de Irrigação Gotejamento", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 190.00, quantity: 2, unit: "Unidade", date: "2026-04-08", relatedType: "geral", relatedName: "Infraestrutura Sítio", paymentMethod: "Cartão", status: "Concluído" },
+  { id: "TX-005", description: "Venda de Mel de Abelha Jataí (4 frascos 250ml)", type: "receita", category: "💰 Venda de Produtos Agro", amount: 160.00, quantity: 1, unit: "Litro", date: "2026-04-06", relatedType: "animal", relatedName: "Meliponário Jataí 01", paymentMethod: "Pix", status: "Concluído" },
+  { id: "TX-006", description: "Compra de Esterco Bovino Curtido (20 sacas)", type: "despesa", category: "🧾 Insumos, Rações e Custos", amount: 180.00, quantity: 20, unit: "Saca", date: "2026-04-04", relatedType: "crop", relatedName: "Horta Geral", paymentMethod: "Pix", status: "Concluído" }
 ]
 
 export const SEED_ALERTS: AlertTaskItem[] = [

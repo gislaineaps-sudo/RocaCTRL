@@ -1,13 +1,13 @@
 {
-  "name": "RoçaCtrl - Gestão de Sítios e Agricultura Familiar",
+  "name": "RoçaCtrl",
   "short_name": "RoçaCtrl",
   "description": "Sistema inteligente para gestão de hortas, pomares, rebanho e finanças do produtor rural.",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F0F4EF",
-  "theme_color": "#51A329",
+  "background_color": "#ffffff",
+  "theme_color": "#166534",
   "lang": "pt-BR",
   "scope": "/",
   "icons": [

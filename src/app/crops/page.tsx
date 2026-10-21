@@ -31,7 +31,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { useCrops, useCategories } from "@/hooks/use-roca-db"
-import { CropItem } from "@/lib/db"
+import { CropItem, AGRO_UNITS } from "@/lib/db"
 import { exportToCSV } from "@/lib/export-utils"
 import { useToast } from "@/hooks/use-toast"
 
@@ -67,6 +67,7 @@ export default function CropsPage() {
     stage: CropItem["stage"]
     progress: number
     area: string
+    unit: string
     plantedDate: string
     expectedHarvest: string
     health: CropItem["health"]
@@ -78,6 +79,7 @@ export default function CropsPage() {
     stage: "Plantio Inicial",
     progress: 10,
     area: "",
+    unit: "kg",
     plantedDate: new Date().toISOString().split("T")[0],
     expectedHarvest: "",
     health: "Saudável",
@@ -105,6 +107,7 @@ export default function CropsPage() {
         stage: crop.stage,
         progress: crop.progress,
         area: crop.area,
+        unit: crop.unit || "kg",
         plantedDate: crop.plantedDate,
         expectedHarvest: crop.expectedHarvest || "",
         health: crop.health,
@@ -119,6 +122,7 @@ export default function CropsPage() {
         stage: "Plantio Inicial",
         progress: 10,
         area: "",
+        unit: "kg",
         plantedDate: new Date().toISOString().split("T")[0],
         expectedHarvest: "",
         health: "Saudável",
@@ -146,6 +150,7 @@ export default function CropsPage() {
       stage: formData.stage,
       progress: Number(formData.progress),
       area: formData.area.trim(),
+      unit: formData.unit || "kg",
       plantedDate: formData.plantedDate,
       expectedHarvest: formData.expectedHarvest.trim() || "Em definição",
       health: formData.health,
@@ -341,10 +346,14 @@ export default function CropsPage() {
                   <Progress value={crop.progress} className="h-2.5" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-slate-100 bg-slate-50 -mx-5 px-5">
+                <div className="grid grid-cols-3 gap-2 text-xs py-2 border-y border-slate-100 bg-slate-50 -mx-5 px-5">
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase font-bold">Área / Tamanho</span>
                     <span className="font-bold text-slate-800">{crop.area}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px] uppercase font-bold">Unid. Colheita</span>
+                    <span className="font-bold text-primary">{crop.unit || "kg"}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase font-bold">Previsão Colheita</span>
@@ -446,16 +455,30 @@ export default function CropsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="crop-area" className="text-xs font-bold text-slate-800">Área / Tamanho Ocupado *</Label>
+                <Label htmlFor="crop-area" className="text-xs font-bold text-slate-800">Área / Tamanho *</Label>
                 <Input
                   id="crop-area"
-                  placeholder="Ex: 25 m², 12 árvores, 2 canteiros"
+                  placeholder="Ex: 25 m², 12 árvores"
                   value={formData.area}
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
                   className="h-11 border-slate-300 text-sm"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="crop-unit" className="text-xs font-bold text-slate-800">Unid. de Medida *</Label>
+                <select
+                  id="crop-unit"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  value={formData.unit}
+                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                >
+                  {AGRO_UNITS.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-1.5">

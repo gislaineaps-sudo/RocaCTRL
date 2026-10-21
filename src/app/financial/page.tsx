@@ -33,7 +33,9 @@ import {
   Search,
   Sprout,
   PawPrint,
-  CheckCircle2
+  CheckCircle2,
+  Share2,
+  MessageCircle
 } from "lucide-react"
 import {
   Dialog,
@@ -51,7 +53,7 @@ import {
   TableRow
 } from "@/components/ui/table"
 import { useTransactions, useCategories, useAnimals, useCrops } from "@/hooks/use-roca-db"
-import { TransactionItem } from "@/lib/db"
+import { TransactionItem, AGRO_UNITS } from "@/lib/db"
 import { exportToCSV } from "@/lib/export-utils"
 import { useToast } from "@/hooks/use-toast"
 
@@ -74,6 +76,8 @@ export default function FinancialPage() {
     type: "receita" | "despesa"
     category: string
     amount: string
+    quantity: string
+    unit: string
     date: string
     relatedType: "animal" | "crop" | "geral"
     relatedName: string
@@ -84,6 +88,8 @@ export default function FinancialPage() {
     type: "receita",
     category: "",
     amount: "",
+    quantity: "1",
+    unit: "Unidade",
     date: new Date().toISOString().split("T")[0],
     relatedType: "geral",
     relatedName: "",
@@ -139,12 +145,14 @@ export default function FinancialPage() {
   const pieData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }))
 
   const handleOpenDialog = (type: "receita" | "despesa" = "receita") => {
-    const defaultCat = finCategories[0]?.name || (type === "receita" ? "Venda de Produtos Agro" : "Custos Operacionais e Ração")
+    const defaultCat = finCategories[0]?.name || (type === "receita" ? "💰 Venda de Produtos Agro" : "🧾 Insumos, Rações e Custos")
     setFormData({
       description: "",
       type,
       category: defaultCat,
       amount: "",
+      quantity: "1",
+      unit: type === "receita" ? "Caixa" : "Saca",
       date: new Date().toISOString().split("T")[0],
       relatedType: "geral",
       relatedName: "",
@@ -165,11 +173,15 @@ export default function FinancialPage() {
       return
     }
 
+    const qty = parseFloat(formData.quantity.replace(",", ".")) || 1
+
     saveTransaction({
       description: formData.description.trim(),
       type: formData.type,
       category: formData.category || "Geral",
       amount: val,
+      quantity: qty,
+      unit: formData.unit || "Unidade",
       date: formData.date,
       relatedType: formData.relatedType,
       relatedName: formData.relatedName.trim() || undefined,
@@ -180,10 +192,33 @@ export default function FinancialPage() {
 
     toast({
       title: formData.type === "receita" ? "Receita registrada!" : "Despesa registrada!",
-      description: `R$ ${val.toFixed(2)} lançado com sucesso.`
+      description: `R$ ${val.toFixed(2)} (${qty} ${formData.unit}) lançado com sucesso.`
     })
 
     setIsDialogOpen(false)
+  }
+
+  const handleShareWhatsApp = () => {
+    const topTx = filteredTransactions.slice(0, 5).map(t => 
+      `• ${t.type === 'receita' ? '🟢' : '🔴'} ${t.description} (${t.quantity || 1} ${t.unit || 'un'}): R$ ${Number(t.amount).toFixed(2)}`
+    ).join("\n")
+
+    const text = [
+      `🌾 *Resumo Financeiro - RoçaCtrl*`,
+      `📅 Data: ${new Date().toLocaleDateString("pt-BR")}`,
+      ``,
+      `💰 *Receitas:* R$ ${totalReceitas.toFixed(2)}`,
+      `📉 *Despesas:* R$ ${totalDespesas.toFixed(2)}`,
+      `📊 *Saldo Líquido:* R$ ${saldoLiquido.toFixed(2)} (Margem: ${margemLucro}%)`,
+      ``,
+      `📋 *Últimos Lançamentos:*`,
+      topTx || "Nenhum lançamento no período.",
+      ``,
+      `_Gerado pelo app RoçaCtrl_`
+    ].join("\n")
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer")
   }
 
   const handleDelete = (tx: TransactionItem) => {
@@ -225,6 +260,14 @@ export default function FinancialPage() {
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShareWhatsApp}
+            className="gap-2 border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-semibold"
+          >
+            <Share2 className="h-4 w-4 text-emerald-600" /> Compartilhar no WhatsApp
+          </Button>
           <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
             <Download className="h-4 w-4" /> Exportar CSV
           </Button>
@@ -408,6 +451,7 @@ export default function FinancialPage() {
                 <TableRow className="bg-muted/40">
                   <TableHead>Data</TableHead>
                   <TableHead>Descrição</TableHead>
+                  <TableHead>Qtd / Unid.</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Categoria</TableHead>
                   <TableHead>Vínculo</TableHead>
@@ -419,7 +463,7 @@ export default function FinancialPage() {
               <TableBody>
                 {filteredTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                       Nenhum lançamento encontrado.
                     </TableCell>
                   </TableRow>
@@ -431,6 +475,9 @@ export default function FinancialPage() {
                       </TableCell>
                       <TableCell className="font-semibold text-foreground">
                         {tx.description}
+                      </TableCell>
+                      <TableCell className="text-xs font-medium text-slate-700">
+                        {tx.quantity || 1} {tx.unit || "Unidade"}
                       </TableCell>
                       <TableCell>
                         {tx.type === "receita" ? (
@@ -516,9 +563,9 @@ export default function FinancialPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="tx-amount">Valor (R$) *</Label>
+                <Label htmlFor="tx-amount" className="text-xs font-bold text-slate-800">Valor Total (R$) *</Label>
                 <Input
                   id="tx-amount"
                   placeholder="0,00"
@@ -527,57 +574,56 @@ export default function FinancialPage() {
                   min="0"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="tx-date">Data</Label>
+                <Label htmlFor="tx-qty" className="text-xs font-bold text-slate-800">Quantidade</Label>
                 <Input
-                  id="tx-date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  id="tx-qty"
+                  placeholder="1"
+                  type="number"
+                  step="0.5"
+                  min="0.1"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="tx-unit" className="text-xs font-bold text-slate-800">Unid. de Medida *</Label>
+                <select
+                  id="tx-unit"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  value={formData.unit}
+                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                >
+                  {AGRO_UNITS.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="tx-category">Categoria</Label>
-                  <select
-                    id="tx-category"
-                    className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  >
-                    <optgroup label="💰 Financeiro e Custos">
-                      {categories.filter(c => c.type === 'FINANCIAL').map(cat => (
-                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="🌳 Culturas & Vegetação">
-                      {categories.filter(c => c.type === 'PLANT').map(cat => (
-                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="🐔 Animais & Criações">
-                      {categories.filter(c => c.type === 'ANIMAL').map(cat => (
-                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="🚜 Infraestrutura">
-                      {categories.filter(c => c.type === 'INFRASTRUCTURE').map(cat => (
-                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                      ))}
-                    </optgroup>
-                  </select>
+                <Label htmlFor="tx-date" className="text-xs font-bold text-slate-800">Data</Label>
+                <Input
+                  id="tx-date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="h-11 border-slate-300 text-sm"
+                />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="tx-method">Forma de Pagamento</Label>
+                <Label htmlFor="tx-method" className="text-xs font-bold text-slate-800">Forma de Pagamento</Label>
                 <select
                   id="tx-method"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
                 >
@@ -588,6 +634,37 @@ export default function FinancialPage() {
                   <option value="Outro">Outro</option>
                 </select>
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="tx-category" className="text-xs font-bold text-slate-800">Categoria</Label>
+              <select
+                id="tx-category"
+                className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              >
+                <optgroup label="💰 Financeiro e Custos">
+                  {categories.filter(c => c.type === 'FINANCIAL').map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="🌳 Culturas & Vegetação">
+                  {categories.filter(c => c.type === 'PLANT').map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="🐔 Animais & Criações">
+                  {categories.filter(c => c.type === 'ANIMAL').map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="🚜 Infraestrutura">
+                  {categories.filter(c => c.type === 'INFRASTRUCTURE').map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </optgroup>
+              </select>
             </div>
 
             <div className="space-y-1.5">

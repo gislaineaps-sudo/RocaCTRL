@@ -8,17 +8,14 @@ import {
   Bell,
   BrainCircuit,
   Settings,
-  HelpCircle,
   Library,
   Cpu,
   Wallet,
-  Type,
-  Contrast
+  MessageSquareWarning
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 import {
   Sidebar,
@@ -28,9 +25,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import { usePreferences, ModuleId } from "@/contexts/preferences-context"
+import { BetaFeedbackModal } from "@/components/beta-feedback-modal"
 
 type NavItem = {
   name: string
@@ -52,9 +49,8 @@ const navigation: NavItem[] = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { state } = useSidebar()
   const { modules } = usePreferences()
-  const logoImage = PlaceHolderImages.find(img => img.id === "app-logo")
+  const [isFeedbackOpen, setIsFeedbackOpen] = React.useState(false)
 
   const visibleNavigation = navigation.filter(item => !item.id || modules[item.id])
 
@@ -101,13 +97,22 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Ajuda">
-              <HelpCircle />
-              <span>Ajuda</span>
+            <SidebarMenuButton
+              tooltip="Relatar Problema / Sugestão"
+              onClick={() => setIsFeedbackOpen(true)}
+              className="text-amber-800 hover:bg-amber-50 hover:text-amber-900 font-medium"
+            >
+              <MessageSquareWarning className="text-amber-600" />
+              <span>Relatar Problema / Sugestão</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <BetaFeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
     </Sidebar>
   )
 }

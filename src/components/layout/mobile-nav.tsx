@@ -14,6 +14,7 @@ import {
   Bell,
   Layers,
   Settings,
+  MessageSquareWarning,
 } from "lucide-react"
 import {
   Dialog,
@@ -21,10 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { BetaFeedbackModal } from "@/components/beta-feedback-modal"
 
 export function MobileNav() {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
   const mainTabs = [
     { name: "Início", href: "/", icon: LayoutDashboard },
@@ -108,9 +111,31 @@ export function MobileNav() {
                 </Link>
               )
             })}
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsMenuOpen(false)
+                setIsFeedbackOpen(true)
+              }}
+              className="flex items-center gap-3 p-3.5 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100/70 text-amber-950 transition-all min-h-[52px] text-left"
+            >
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-700">
+                <MessageSquareWarning className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-900">Relatar Problema / Sugestão</p>
+                <p className="text-xs text-slate-600">Canal direto de suporte e feedback Beta</p>
+              </div>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <BetaFeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
     </>
   )
 }

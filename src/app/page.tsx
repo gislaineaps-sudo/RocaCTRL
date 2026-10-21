@@ -28,7 +28,8 @@ import {
   Sparkles,
   Info,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  Moon
 } from "lucide-react"
 import { 
   LineChart, 
@@ -55,6 +56,39 @@ const cropEfficiencyData = [
   { month: "Jun", horta: 175, pomar: 90, meta: 210 },
 ]
 
+function getMoonPhaseInfo(date = new Date()) {
+  // Ciclo sinódico lunar médio: 29.53058867 dias
+  const knownNewMoon = new Date("2026-01-18T19:52:00Z").getTime()
+  const diffDays = (date.getTime() - knownNewMoon) / (1000 * 60 * 60 * 24)
+  const phaseAge = ((diffDays % 29.53058867) + 29.53058867) % 29.53058867
+
+  if (phaseAge < 7.38) {
+    return {
+      emoji: "🌑",
+      name: "Lua Nova",
+      tip: "Ideal para podas de limpeza, preparo de canteiros e adubação de base."
+    }
+  } else if (phaseAge < 14.76) {
+    return {
+      emoji: "🌒",
+      name: "Lua Crescente",
+      tip: "Ideal para folhas, frutos e cereais (alface, tomate, milho, feijão)."
+    }
+  } else if (phaseAge < 22.14) {
+    return {
+      emoji: "🌕",
+      name: "Lua Cheia",
+      tip: "Seiva na copa: ótimo para colher frutos suculentos, flores e ervas medicinais."
+    }
+  } else {
+    return {
+      emoji: "🌘",
+      name: "Lua Minguante",
+      tip: "Seiva nas raízes: ideal para plantar mandioca, cenoura, beterraba e cortar bambu/madeira."
+    }
+  }
+}
+
 export default function Dashboard() {
   const { animals } = useAnimals()
   const { crops } = useCrops()
@@ -67,6 +101,15 @@ export default function Dashboard() {
   const [isLocating, setIsLocating] = useState(false)
   const [temperature, setTemperature] = useState(27)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [moonPhase, setMoonPhase] = useState({
+    emoji: "🌒",
+    name: "Lua Crescente",
+    tip: "Ideal para folhas, frutos e cereais (alface, tomate, milho, feijão)."
+  })
+
+  useEffect(() => {
+    setMoonPhase(getMoonPhaseInfo(new Date()))
+  }, [])
 
   // Valores simulados de sensores IoT com farol de alerta
   const sensorMoisture = 52 // 25 - 60% = Amarelo
@@ -188,11 +231,11 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Widget Clima & Cidade */}
-        <div className="flex flex-col gap-2 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
-          <div className="flex items-center gap-4">
+        {/* Widget Clima, Fase da Lua & Cidade */}
+        <div className="flex flex-col gap-2.5 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs max-w-md w-full lg:w-auto">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 pr-4 border-r border-slate-200">
-              <CloudSun className="h-8 w-8 text-amber-500" />
+              <CloudSun className="h-8 w-8 text-amber-500 shrink-0" />
               <div>
                 <p className="text-2xl font-bold leading-none text-slate-900">{temperature}°C</p>
                 <p className="text-[10px] text-slate-700 uppercase font-bold tracking-wider">Agradável</p>
@@ -216,6 +259,22 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {/* Indicador de Fase da Lua com Dica de Manejo */}
+          <div className="bg-emerald-50/80 border border-emerald-200/80 rounded-xl px-3 py-2 flex items-start gap-2.5">
+            <span className="text-lg leading-none mt-0.5 shrink-0" role="img" aria-label={moonPhase.name}>
+              {moonPhase.emoji}
+            </span>
+            <div className="text-left">
+              <p className="text-xs font-bold text-emerald-950 leading-tight">
+                {moonPhase.name} <span className="font-normal text-emerald-800">— Calendário Lunar</span>
+              </p>
+              <p className="text-[11px] text-emerald-800 font-medium leading-snug mt-0.5">
+                {moonPhase.tip}
+              </p>
+            </div>
+          </div>
+
           <Button 
             variant="ghost" 
             size="sm" 

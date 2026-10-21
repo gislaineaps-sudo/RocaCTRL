@@ -17,7 +17,8 @@ import {
   Plus,
   Trash2,
   Download,
-  CalendarCheck
+  CalendarCheck,
+  Share2
 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { useAlerts, useCategories } from "@/hooks/use-roca-db"
@@ -118,6 +119,27 @@ export default function AlertsPage() {
     exportToCSV("tarefas_alertas_rocactrl", data)
   }
 
+  const handleShareWhatsApp = () => {
+    const pendingTasks = alerts.filter(a => a.status !== "Concluído")
+    const taskLines = pendingTasks.map(t => 
+      `• [${t.priority.toUpperCase()}] *${t.title}* (${t.date}) - ${t.category}`
+    ).join("\n")
+
+    const text = [
+      `🔔 *Cronograma & Alertas de Campo - RoçaCtrl*`,
+      `📅 Data: ${new Date().toLocaleDateString("pt-BR")}`,
+      `⏳ Pendentes: ${pendingCount} | ✅ Concluídas: ${completedCount}`,
+      ``,
+      `📋 *Próximas Atividades de Manejo:*`,
+      taskLines || "Todas as tarefas estão em dia! 🎉",
+      ``,
+      `_Gerado pelo app RoçaCtrl_`
+    ].join("\n")
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer")
+  }
+
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "Alta":
@@ -148,6 +170,14 @@ export default function AlertsPage() {
         </div>
         
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShareWhatsApp}
+            className="gap-2 border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-semibold"
+          >
+            <Share2 className="h-4 w-4 text-emerald-600" /> Compartilhar no WhatsApp
+          </Button>
           <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
             <Download className="h-4 w-4" /> Exportar CSV
           </Button>
