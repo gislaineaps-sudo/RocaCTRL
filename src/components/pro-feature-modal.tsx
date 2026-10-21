@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, Check, Zap, Cpu } from "lucide-react"
+import { Sparkles, Check, Zap, Cpu, Mail } from "lucide-react"
+import { doc, setDoc } from "firebase/firestore"
+import { db, isFirebaseConfigured } from "@/lib/firebase"
+import { RocaDB } from "@/lib/db"
+import { useAuth } from "@/context/AuthContext"
+import { useToast } from "@/hooks/use-toast"
 
 interface ProFeatureModalProps {
   isOpen: boolean
@@ -26,6 +31,29 @@ export function ProFeatureModal({
   featureName = "Plano Chácara Produtiva",
   limitDescription = "Você atingiu o limite do Plano Gratuito (até 2 culturas / 15 animais).",
 }: ProFeatureModalProps) {
+  const { user } = useAuth()
+  const { toast } = useToast()
+
+  const handleRequestPlan = (planName: string) => {
+    const saved = RocaDB.saveFeedback({
+      userId: user?.uid || "demo",
+      uid: user?.uid || "demo",
+      userName: user?.name || "Produtor(a)",
+      userEmail: user?.email || "visitante@rocactrl.com.br",
+      farmName: user?.farmName || "Meu Sítio",
+      type: "sugestao",
+      message: `Solicitação de upgrade para o plano: ${planName}`,
+      status: "pending",
+    })
+    if (isFirebaseConfigured && db) {
+      setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
+    }
+    toast({
+      title: "Solicitação enviada com sucesso! 🌱",
+      description: "Mensagem enviada com sucesso! Nossa equipe responderá em breve.",
+    })
+    onClose()
+  }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg rounded-2xl p-6">
@@ -78,15 +106,7 @@ export function ProFeatureModal({
 
             <Button
               className="w-full h-10 text-xs bg-primary hover:bg-primary/90 text-white font-bold"
-              onClick={() => {
-                window.open(
-                  `https://wa.me/?text=${encodeURIComponent(
-                    "Olá! Quero ativar o Plano Chácara Produtiva - Pro (R$ 9,90/mês) no RoçaCtrl!"
-                  )}`,
-                  "_blank"
-                )
-                onClose()
-              }}
+              onClick={() => handleRequestPlan("Chácara Produtiva - Pro (R$ 9,90/mês)")}
             >
               Assinar Pro (R$ 9,90)
             </Button>
@@ -119,7 +139,7 @@ export function ProFeatureModal({
                 </li>
                 <li className="flex items-start gap-1.5">
                   <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 mt-0.5" />
-                  <span>Alertas automáticos no WhatsApp</span>
+                  <span>Alertas automáticos de manejo</span>
                 </li>
               </ul>
             </div>
@@ -127,19 +147,22 @@ export function ProFeatureModal({
             <Button
               variant="outline"
               className="w-full h-10 text-xs border-slate-300 text-slate-900 font-bold hover:bg-slate-100"
-              onClick={() => {
-                window.open(
-                  `https://wa.me/?text=${encodeURIComponent(
-                    "Olá! Quero ativar o Plano Sítio Conectado - IoT (R$ 24,90/mês) no RoçaCtrl!"
-                  )}`,
-                  "_blank"
-                )
-                onClose()
-              }}
+              onClick={() => handleRequestPlan("Sítio Conectado - IoT (R$ 24,90/mês)")}
             >
               Assinar IoT (R$ 24,90)
             </Button>
           </div>
+        </div>
+
+        <div className="text-center text-xs text-slate-600 flex items-center justify-center gap-1.5 pt-1">
+          <Mail className="h-3.5 w-3.5 text-emerald-700" />
+          <span>Dúvidas sobre planos?</span>
+          <a
+            href="mailto:suporte.rocactrl@gmail.com"
+            className="font-mono font-bold text-emerald-800 hover:underline"
+          >
+            suporte.rocactrl@gmail.com
+          </a>
         </div>
 
         <DialogFooter className="mt-1">

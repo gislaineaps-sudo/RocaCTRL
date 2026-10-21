@@ -12,7 +12,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { MessageSquareWarning, Send, Share2, Sparkles, Bug, HelpCircle } from "lucide-react"
+import {
+  MessageSquareWarning,
+  Send,
+  Sparkles,
+  Bug,
+  HelpCircle,
+  Mail,
+  Copy,
+  Check,
+} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { doc, setDoc } from "firebase/firestore"
 import { db, isFirebaseConfigured } from "@/lib/firebase"
@@ -27,11 +36,40 @@ interface BetaFeedbackModalProps {
 export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
   const { toast } = useToast()
   const { user } = useAuth()
-  const [feedbackType, setFeedbackType] = useState<"sugestao" | "problema" | "duvida">("sugestao")
+  const [feedbackType, setFeedbackType] = useState<"duvida" | "sugestao" | "problema">("duvida")
   const [message, setMessage] = useState("")
   const [userName, setUserName] = useState("")
+  const [copied, setCopied] = useState(false)
 
-  const persistFeedback = () => {
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText("suporte.rocactrl@gmail.com")
+      setCopied(true)
+      toast({
+        title: "E-mail copiado!",
+        description: "suporte.rocactrl@gmail.com copiado para a área de transferência.",
+      })
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      toast({
+        title: "E-mail de suporte",
+        description: "suporte.rocactrl@gmail.com",
+      })
+    }
+  }
+
+  const handleSubmitForm = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+
+    if (!message.trim()) {
+      toast({
+        title: "Escreva sua mensagem",
+        description: "Por favor, descreva sua dúvida, sugestão ou erro no sistema.",
+        variant: "destructive",
+      })
+      return
+    }
+
     const saved = RocaDB.saveFeedback({
       userId: user?.uid || "demo",
       uid: user?.uid || "demo",
@@ -39,60 +77,17 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
       userEmail: user?.email || "visitante@rocactrl.com.br",
       farmName: user?.farmName || "Meu Sítio",
       type: feedbackType,
-      message: message.trim() || "Contato via botão de suporte Beta",
+      message: message.trim(),
       status: "pending",
     })
+
     if (isFirebaseConfigured && db) {
       setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
     }
-    return saved
-  }
-
-  const handleSendWhatsApp = () => {
-    persistFeedback()
-
-    const typeLabel =
-      feedbackType === "sugestao"
-        ? "💡 Sugestão de Melhoria"
-        : feedbackType === "problema"
-        ? "🐞 Relato de Problema (Beta)"
-        : "❓ Dúvida de Uso"
-
-    const text = [
-      `🌾 *Feedback Beta - RoçaCtrl*`,
-      `📌 *Tipo:* ${typeLabel}`,
-      `👤 *Produtor(a):* ${userName.trim() || user?.name || "Produtor(a)"} (${user?.farmName || "Minha Chácara"})`,
-      `💬 *Mensagem:* ${message.trim() || "Gostaria de falar com o suporte do RoçaCtrl."}`,
-    ]
-      .filter(Boolean)
-      .join("\n")
-
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer")
 
     toast({
-      title: "Redirecionando para o WhatsApp",
-      description: "Seu relato também foi registrado na Caixa de Entrada da plataforma!",
-    })
-    setMessage("")
-    onClose()
-  }
-
-  const handleQuickSave = () => {
-    if (!message.trim()) {
-      toast({
-        title: "Escreva sua mensagem",
-        description: "Por favor, descreva sua sugestão ou o problema encontrado.",
-        variant: "destructive",
-      })
-      return
-    }
-
-    persistFeedback()
-
-    toast({
-      title: "Feedback Beta Registrado! 🌱",
-      description: "Sua contribuição foi salva na coleção de feedbacks para a administradora.",
+      title: "Mensagem enviada com sucesso! 🌱",
+      description: "Mensagem enviada com sucesso! Nossa equipe responderá em breve.",
     })
     setMessage("")
     onClose()
@@ -104,23 +99,36 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-headline font-bold text-slate-900">
             <MessageSquareWarning className="h-5 w-5 text-primary" />
-            Relatar Problema / Sugestão (Beta)
+            Suporte & Relato de Problemas
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-600">
-            Encontrou algum erro ou tem uma ideia para facilitar o dia a dia no campo? Conte para nós!
+            Envie sua mensagem diretamente para nossa equipe ou entre em contato pelo e-mail oficial.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <form onSubmit={handleSubmitForm} className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label className="text-xs font-bold text-slate-800">O que você deseja enviar?</Label>
+            <Label className="text-xs font-bold text-slate-800">Qual o tipo do seu contato?</Label>
             <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setFeedbackType("duvida")}
+                className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                  feedbackType === "duvida"
+                    ? "border-amber-600 bg-amber-50 text-amber-900 shadow-2xs"
+                    : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                <HelpCircle className="h-4 w-4" />
+                <span>Dúvida</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setFeedbackType("sugestao")}
                 className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
                   feedbackType === "sugestao"
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-primary bg-primary/10 text-primary shadow-2xs"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
@@ -133,25 +141,12 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
                 onClick={() => setFeedbackType("problema")}
                 className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
                   feedbackType === "problema"
-                    ? "border-rose-600 bg-rose-50 text-rose-800"
+                    ? "border-rose-600 bg-rose-50 text-rose-800 shadow-2xs"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 <Bug className="h-4 w-4" />
-                <span>Problema</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setFeedbackType("duvida")}
-                className={`p-2.5 rounded-xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                  feedbackType === "duvida"
-                    ? "border-amber-600 bg-amber-50 text-amber-900"
-                    : "border-slate-200 text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                <HelpCircle className="h-4 w-4" />
-                <span>Dúvida</span>
+                <span>Erro no Sistema</span>
               </button>
             </div>
           </div>
@@ -162,7 +157,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
             </Label>
             <Input
               id="fb-name"
-              placeholder={user ? `${user.name} - ${user.farmName}` : "Ex: João - Sítio Boa Esperança"}
+              placeholder={user ? `${user.name} - ${user.farmName}` : "Ex: João - Meu Sítio"}
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               className="h-10 border-slate-300 text-sm"
@@ -171,46 +166,64 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
 
           <div className="space-y-1.5">
             <Label htmlFor="fb-msg" className="text-xs font-bold text-slate-800">
-              Descrição do Problema ou Sugestão *
+              Sua Mensagem *
             </Label>
             <textarea
               id="fb-msg"
               rows={3}
-              placeholder="Descreva aqui o que aconteceu ou sua sugestão de melhoria..."
+              placeholder="Escreva aqui sua dúvida, sugestão ou descreva o erro encontrado..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               className="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+              required
             />
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex flex-col gap-0.5">
-            <span className="font-bold text-slate-900">Canal Oficial de Suporte Direto:</span>
-            <a
-              href="mailto:suporte.rocactrl@gmail.com"
-              className="font-mono font-bold text-emerald-800 hover:underline"
+          <DialogFooter className="pt-1">
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold gap-2 h-11 rounded-xl"
             >
-              suporte.rocactrl@gmail.com
-            </a>
-          </div>
-        </div>
+              <Send className="h-4 w-4" /> Enviar Mensagem para o Suporte
+            </Button>
+          </DialogFooter>
+        </form>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+        {/* Canal 2: E-mail Oficial com botão de Copiar */}
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-lg bg-emerald-100 text-emerald-800 shrink-0">
+              <Mail className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold text-slate-700">E-mail Oficial de Atendimento:</p>
+              <a
+                href="mailto:suporte.rocactrl@gmail.com"
+                className="text-xs font-mono font-bold text-emerald-800 hover:underline truncate block"
+              >
+                suporte.rocactrl@gmail.com
+              </a>
+            </div>
+          </div>
+
           <Button
             type="button"
             variant="outline"
-            onClick={handleSendWhatsApp}
-            className="w-full sm:w-auto gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-semibold h-11"
+            size="sm"
+            onClick={handleCopyEmail}
+            className="h-9 px-3 text-xs font-bold border-slate-300 text-slate-800 hover:bg-slate-100 gap-1.5 shrink-0"
           >
-            <Share2 className="h-4 w-4 text-emerald-600" /> Enviar via WhatsApp
+            {copied ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-emerald-600" /> Copiado
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" /> Copiar e-mail
+              </>
+            )}
           </Button>
-          <Button
-            type="button"
-            onClick={handleQuickSave}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold gap-1.5 h-11"
-          >
-            <Send className="h-4 w-4" /> Salvar no Sistema
-          </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )

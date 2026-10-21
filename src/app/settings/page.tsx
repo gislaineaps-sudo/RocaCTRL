@@ -26,8 +26,12 @@ import {
   Check,
   Key,
   CreditCard,
+  MessageSquareWarning,
+  Mail,
+  Copy,
 } from "lucide-react"
 import { ProFeatureModal } from "@/components/pro-feature-modal"
+import { BetaFeedbackModal } from "@/components/beta-feedback-modal"
 import { useToast } from "@/hooks/use-toast"
 
 export default function SettingsPage() {
@@ -37,7 +41,26 @@ export default function SettingsPage() {
   const { toast } = useToast()
 
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
+  const [copiedEmail, setCopiedEmail] = useState(false)
   const [apiKey, setApiKey] = useState("")
+
+  const handleCopySupportEmail = async () => {
+    try {
+      await navigator.clipboard.writeText("suporte.rocactrl@gmail.com")
+      setCopiedEmail(true)
+      toast({
+        title: "E-mail copiado!",
+        description: "suporte.rocactrl@gmail.com copiado para a área de transferência.",
+      })
+      setTimeout(() => setCopiedEmail(false), 2500)
+    } catch {
+      toast({
+        title: "E-mail de suporte",
+        description: "suporte.rocactrl@gmail.com",
+      })
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -397,11 +420,70 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* SEÇÃO 4: SUPORTE E RELATO DE PROBLEMAS (RODAPÉ DE ATENDIMENTO) */}
+      <Card className="border-slate-200 bg-slate-50/60">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-slate-900 font-bold">
+            <MessageSquareWarning className="h-5 w-5 text-primary" />
+            Suporte & Relato de Problemas
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-600">
+            Precisa de ajuda, quer enviar uma sugestão ou relatar um erro no sistema? Utilize nossos canais oficiais:
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-slate-200 flex-1">
+            <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 shrink-0">
+              <Mail className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-slate-700">E-mail Oficial de Atendimento</p>
+              <a
+                href="mailto:suporte.rocactrl@gmail.com"
+                className="text-sm font-mono font-bold text-emerald-800 hover:underline truncate block"
+              >
+                suporte.rocactrl@gmail.com
+              </a>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCopySupportEmail}
+              className="h-9 px-3 text-xs font-bold border-slate-300 text-slate-800 gap-1.5 shrink-0"
+            >
+              {copiedEmail ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-emerald-600" /> Copiado
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" /> Copiar e-mail
+                </>
+              )}
+            </Button>
+          </div>
+
+          <Button
+            type="button"
+            onClick={() => setIsSupportModalOpen(true)}
+            className="h-12 px-5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl gap-2 shrink-0"
+          >
+            <MessageSquareWarning className="h-4 w-4" /> Abrir Formulário de Suporte
+          </Button>
+        </CardContent>
+      </Card>
+
       <ProFeatureModal
         isOpen={isProModalOpen}
         onClose={() => setIsProModalOpen(false)}
         featureName="Plano Chácara Produtiva (Pro)"
         limitDescription="Desbloqueie todo o potencial de manejo, IA e automação para sua propriedade."
+      />
+
+      <BetaFeedbackModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
       />
     </div>
   )

@@ -363,7 +363,7 @@ export default function AdminDashboardPage() {
                           }
                         >
                           {fb.type === "problema"
-                            ? "🐞 Problema"
+                            ? "🐞 Erro no Sistema"
                             : fb.type === "sugestao"
                             ? "💡 Sugestão"
                             : "❓ Dúvida"}
