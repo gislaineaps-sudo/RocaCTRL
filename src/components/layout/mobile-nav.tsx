@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Sprout,
@@ -15,6 +15,9 @@ import {
   Layers,
   Settings,
   MessageSquareWarning,
+  ShieldCheck,
+  LogOut,
+  LogIn,
 } from "lucide-react"
 import {
   Dialog,
@@ -23,9 +26,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { BetaFeedbackModal } from "@/components/beta-feedback-modal"
+import { useAuth } from "@/context/AuthContext"
 
 export function MobileNav() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, isAdmin, signOut } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
 
@@ -41,8 +47,14 @@ export function MobileNav() {
     { name: "Controle Financeiro", href: "/financial", icon: Wallet, desc: "Receitas, despesas e margens" },
     { name: "Banco de Categorias", href: "/categories", icon: Layers, desc: "Setores e espécies típicas" },
     { name: "Tarefas e Alertas", href: "/alerts", icon: Bell, desc: "Rotinas e calendário safra" },
-    { name: "Configurações & Plano", href: "/settings", icon: Settings, desc: "Plano Pro e preferências" },
+    { name: "Configurações & Planos", href: "/settings", icon: Settings, desc: "Planos R$ 9,90 e preferências" },
   ]
+
+  const handleLogout = async () => {
+    setIsMenuOpen(false)
+    await signOut()
+    router.push("/login")
+  }
 
   return (
     <>
@@ -88,6 +100,22 @@ export function MobileNav() {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-2 pt-2">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 p-3.5 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-950 transition-all min-h-[52px]"
+              >
+                <div className="p-2 rounded-xl bg-emerald-700 text-white">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Painel da Administradora</p>
+                  <p className="text-xs text-emerald-800 font-medium">Gestão de usuários, planos e MRR</p>
+                </div>
+              </Link>
+            )}
+
             {extraTabs.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -128,6 +156,36 @@ export function MobileNav() {
                 <p className="text-xs text-slate-600">Canal direto de suporte e feedback Beta</p>
               </div>
             </button>
+
+            {user && user.uid !== "demo" ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-3 p-3.5 rounded-xl border border-rose-200 bg-rose-50/60 hover:bg-rose-100/60 text-rose-900 transition-all min-h-[52px] text-left"
+              >
+                <div className="p-2 rounded-xl bg-rose-600 text-white">
+                  <LogOut className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-rose-900">Sair da Conta</p>
+                  <p className="text-xs text-rose-700">{user.email}</p>
+                </div>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-3 p-3.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary transition-all min-h-[52px]"
+              >
+                <div className="p-2 rounded-xl bg-primary text-white">
+                  <LogIn className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Entrar / Criar Conta Grátis</p>
+                  <p className="text-xs text-slate-600">Sincronizar dados da sua propriedade</p>
+                </div>
+              </Link>
+            )}
           </div>
         </DialogContent>
       </Dialog>

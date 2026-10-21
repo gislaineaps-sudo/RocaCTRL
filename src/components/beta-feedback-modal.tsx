@@ -14,6 +14,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageSquareWarning, Send, Share2, Sparkles, Bug, HelpCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { doc, setDoc } from "firebase/firestore"
+import { db, isFirebaseConfigured } from "@/lib/firebase"
+import { RocaDB } from "@/lib/db"
+import { useAuth } from "@/context/AuthContext"
 
 interface BetaFeedbackModalProps {
   isOpen: boolean
@@ -22,11 +26,29 @@ interface BetaFeedbackModalProps {
 
 export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
   const { toast } = useToast()
+  const { user } = useAuth()
   const [feedbackType, setFeedbackType] = useState<"sugestao" | "problema" | "duvida">("sugestao")
   const [message, setMessage] = useState("")
   const [userName, setUserName] = useState("")
 
+  const persistFeedback = () => {
+    const saved = RocaDB.saveFeedback({
+      uid: user?.uid || "demo",
+      userName: userName.trim() || user?.name || "Produtor(a)",
+      userEmail: user?.email,
+      farmName: user?.farmName || "Minha Chácara",
+      type: feedbackType,
+      message: message.trim() || "Contato via botão de suporte Beta",
+    })
+    if (isFirebaseConfigured && db) {
+      setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
+    }
+    return saved
+  }
+
   const handleSendWhatsApp = () => {
+    persistFeedback()
+
     const typeLabel =
       feedbackType === "sugestao"
         ? "💡 Sugestão de Melhoria"
@@ -37,7 +59,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
     const text = [
       `🌾 *Feedback Beta - RoçaCtrl*`,
       `📌 *Tipo:* ${typeLabel}`,
-      userName.trim() ? `👤 *Produtor(a):* ${userName.trim()}` : null,
+      `👤 *Produtor(a):* ${userName.trim() || user?.name || "Produtor(a)"} (${user?.farmName || "Minha Chácara"})`,
       `💬 *Mensagem:* ${message.trim() || "Gostaria de falar com o suporte do RoçaCtrl."}`,
     ]
       .filter(Boolean)
@@ -48,7 +70,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
 
     toast({
       title: "Redirecionando para o WhatsApp",
-      description: "Obrigado por ajudar a melhorar o RoçaCtrl!",
+      description: "Seu relato também foi registrado na Caixa de Entrada da plataforma!",
     })
     setMessage("")
     onClose()
@@ -64,9 +86,11 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
       return
     }
 
+    persistFeedback()
+
     toast({
       title: "Feedback Beta Registrado! 🌱",
-      description: "Sua contribuição foi salva e enviada para a equipe do RoçaCtrl.",
+      description: "Sua contribuição foi salva na coleção de feedbacks para a administradora.",
     })
     setMessage("")
     onClose()
@@ -136,7 +160,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
             </Label>
             <Input
               id="fb-name"
-              placeholder="Ex: João - Sítio Boa Esperança"
+              placeholder={user ? `${user.name} - ${user.farmName}` : "Ex: João - Sítio Boa Esperança"}
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               className="h-10 border-slate-300 text-sm"
@@ -172,7 +196,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
             onClick={handleQuickSave}
             className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold gap-1.5 h-11"
           >
-            <Send className="h-4 w-4" /> Enviar Feedback
+            <Send className="h-4 w-4" /> Salvar no Sistema
           </Button>
         </DialogFooter>
       </DialogContent>
