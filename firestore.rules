@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Define suporte.rocactrl@gmail.com como Administradora Geral
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "suporte.rocactrl@gmail.com";
+    }
+
+    // Perfil do usuário e assinatura
+    match /users/{userId} {
+      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      
+      // Subcoleções isoladas por propriedade rural (crops, animals, financial, categories, alerts)
+      match /{collectionName}/{docId} {
+        allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      }
+    }
+
+    // Coleção de feedbacks e suporte enviados pelos usuários
+    match /feedbacks/{feedbackId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

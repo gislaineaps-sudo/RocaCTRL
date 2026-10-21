@@ -50,9 +50,9 @@ export function checkIsAdminEmail(email?: string | null): boolean {
   const envAdmin = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").trim().toLowerCase()
   if (envAdmin && normalized === envAdmin) return true
   if (
+    normalized === "suporte.rocactrl@gmail.com" ||
     normalized === "gislaine@rocactrl.com.br" ||
-    normalized === "gislaineaps@gmail.com" ||
-    normalized.startsWith("gislaine")
+    normalized === "gislaineaps@gmail.com"
   ) {
     return true
   }
@@ -212,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Fallback instantâneo caso variáveis de ambiente do Firebase ainda não estejam no .env
     const mockUid = `google-${Date.now()}`
-    const defaultEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "gislaine@rocactrl.com.br"
+    const defaultEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "suporte.rocactrl@gmail.com"
     const isAdmin = checkIsAdminEmail(defaultEmail)
     const profile: UserProfile = {
       uid: mockUid,

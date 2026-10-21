@@ -309,8 +309,8 @@ export const SEED_ALERTS: AlertTaskItem[] = [
 export const SEED_USERS: UserProfile[] = [
   {
     uid: "usr-admin-1",
-    name: "Gislaine (Administradora)",
-    email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "gislaine@rocactrl.com.br",
+    name: "Administradora RoçaCtrl",
+    email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "suporte.rocactrl@gmail.com",
     farmName: "Sítio Matriz RoçaCtrl",
     plan: "iot",
     role: "admin",
