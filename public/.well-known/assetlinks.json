@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.roca_ctrl.twa",
+        "sha256_cert_fingerprints": ["66:27:D4:22:C1:E5:92:A6:48:02:B8:4A:5A:89:48:6C:99:92:BF:C6:59:EE:64:A3:FC:86:F6:89:E0:8A:30:29"]
+      }
+    }]
