@@ -31,5 +31,21 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Painel de Controlo no Telemóvel"
+    },
+    {
+      "src": "/screenshots/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Visão Geral no Computador"
+    }
+  ],
   "categories": ["business", "productivity", "agriculture"]
 }
