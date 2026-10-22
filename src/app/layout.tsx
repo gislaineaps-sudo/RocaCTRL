@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/logo.jpg",
-    apple: "/logo.jpg",
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/icon-192x192.png",
   },
 }
 
@@ -47,7 +47,8 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/logo.jpg" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

@@ -2,13 +2,14 @@
  * RoçaCtrl Service Worker para Cache Offline e PWA
  */
 
-const CACHE_NAME = 'rocactrl-cache-v1';
+const CACHE_NAME = 'rocactrl-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
   '/logo.jpg',
-  '/Logo lateral.png',
-  '/favicon.ico'
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/icon-maskable-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,7 +37,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Apenas métodos GET são cacheados
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
@@ -46,11 +46,10 @@ self.addEventListener('fetch', (event) => {
       }
       return fetch(event.request)
         .then((networkResponse) => {
-          // Atualiza cache de arquivos estáticos
           if (
             networkResponse &&
             networkResponse.status === 200 &&
-            (event.request.url.includes('/_next/static/') || event.request.url.includes('/images/'))
+            (event.request.url.includes('/_next/static/') || event.request.url.includes('/icons/'))
           ) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -60,7 +59,6 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // Fallback para página inicial se estiver offline
           if (event.request.mode === 'navigate') {
             return caches.match('/');
           }
