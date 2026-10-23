@@ -394,7 +394,7 @@ export default function AnimalsPage() {
                 placeholder="Ex: Lote Frangos 02, Mimosa, Colmeia 05..."
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
 
@@ -406,7 +406,7 @@ export default function AnimalsPage() {
                 </Label>
                 <select
                   id="anim-category"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
@@ -423,7 +423,7 @@ export default function AnimalsPage() {
                   placeholder="Ex: Galinha Caipira, Saanen, Tilápia..."
                   value={formData.species}
                   onChange={(e) => setFormData({ ...formData, species: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
             </div>
@@ -437,7 +437,7 @@ export default function AnimalsPage() {
                   min="1"
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -449,7 +449,7 @@ export default function AnimalsPage() {
                   min="1"
                   value={formData.age}
                   onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -457,7 +457,7 @@ export default function AnimalsPage() {
                 <Label htmlFor="anim-unit" className="text-xs font-bold text-slate-800">Unidade</Label>
                 <select
                   id="anim-unit"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.unitAge}
                   onChange={(e) => setFormData({ ...formData, unitAge: e.target.value as any })}
                 >
@@ -473,7 +473,7 @@ export default function AnimalsPage() {
                 <Label htmlFor="anim-status" className="text-xs font-bold text-slate-800">Status Sanitário</Label>
                 <select
                   id="anim-status"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                 >
@@ -490,7 +490,7 @@ export default function AnimalsPage() {
                   placeholder="Ex: Piquete 01, Galinheiro B..."
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
             </div>
@@ -502,7 +502,7 @@ export default function AnimalsPage() {
                 placeholder="Ex: Vacinação em dia, postura de 24 ovos/dia, suplementação mineral..."
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
           </div>

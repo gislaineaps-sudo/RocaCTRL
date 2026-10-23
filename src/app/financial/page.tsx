@@ -554,12 +554,13 @@ export default function FinancialPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="tx-desc">Descrição do Lançamento *</Label>
+              <Label htmlFor="tx-desc" className="text-xs font-bold text-slate-800">Descrição do Lançamento *</Label>
               <Input
                 id="tx-desc"
                 placeholder={formData.type === "receita" ? "Ex: Venda de 10 dúzias de ovos, colheita alface..." : "Ex: Compra de saco de ração 50kg, adubo orgânico..."}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
 
@@ -574,7 +575,7 @@ export default function FinancialPage() {
                   min="0"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -588,7 +589,7 @@ export default function FinancialPage() {
                   min="0.1"
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -596,7 +597,7 @@ export default function FinancialPage() {
                 <Label htmlFor="tx-unit" className="text-xs font-bold text-slate-800">Unid. de Medida *</Label>
                 <select
                   id="tx-unit"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 >
@@ -615,7 +616,7 @@ export default function FinancialPage() {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -623,7 +624,7 @@ export default function FinancialPage() {
                 <Label htmlFor="tx-method" className="text-xs font-bold text-slate-800">Forma de Pagamento</Label>
                 <select
                   id="tx-method"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
                 >
@@ -640,7 +641,7 @@ export default function FinancialPage() {
               <Label htmlFor="tx-category" className="text-xs font-bold text-slate-800">Categoria</Label>
               <select
                 id="tx-category"
-                className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               >
@@ -668,10 +669,10 @@ export default function FinancialPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="tx-related">Vínculo com Atividade (Opcional)</Label>
+              <Label htmlFor="tx-related" className="text-xs font-bold text-slate-800">Vínculo com Atividade (Opcional)</Label>
               <select
                 id="tx-related"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                 value={formData.relatedName}
                 onChange={(e) => setFormData({ ...formData, relatedName: e.target.value })}
               >

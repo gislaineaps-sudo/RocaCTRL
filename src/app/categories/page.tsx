@@ -445,7 +445,7 @@ export default function CategoriesPage() {
                 placeholder="Ex: 🌳 Fruticultura Orgânica, 🐔 Avicultura Caipira..."
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
 
@@ -457,7 +457,7 @@ export default function CategoriesPage() {
                   placeholder="Ex: m², árvores, cabeças, kg"
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -468,7 +468,7 @@ export default function CategoriesPage() {
                   placeholder="Ex: 🌳, 🥬, 🐔, 🐄, 🐝, 💰"
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
             </div>
@@ -480,7 +480,7 @@ export default function CategoriesPage() {
                 placeholder="Ex: Alface crespa, Tomate cereja, Galinha Caipira..."
                 value={formData.species}
                 onChange={(e) => setFormData({ ...formData, species: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
 
@@ -491,7 +491,7 @@ export default function CategoriesPage() {
                 placeholder="Ex: Maços frescos, Ovos coloniais, Frutas in natura..."
                 value={formData.products}
                 onChange={(e) => setFormData({ ...formData, products: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
           </div>

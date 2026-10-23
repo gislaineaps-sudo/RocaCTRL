@@ -160,7 +160,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
               placeholder={user ? `${user.name} - ${user.farmName}` : "Ex: João - Meu Sítio"}
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="h-10 border-slate-300 text-sm"
+              className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
             />
           </div>
 
@@ -174,7 +174,7 @@ export function BetaFeedbackModal({ isOpen, onClose }: BetaFeedbackModalProps) {
               placeholder="Escreva aqui sua dúvida, sugestão ou descreva o erro encontrado..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-xl bg-white border border-gray-300 p-3 text-sm text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
               required
             />
           </div>

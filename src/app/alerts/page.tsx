@@ -244,7 +244,7 @@ export default function AlertsPage() {
                     <Label htmlFor="task-priority" className="text-xs">Prioridade</Label>
                     <select
                       id="task-priority"
-                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      className="flex h-9 w-full rounded-lg bg-white border border-gray-300 px-2 py-1 text-xs text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                       value={newTaskPriority}
                       onChange={(e) => setNewTaskPriority(e.target.value as any)}
                     >
@@ -260,7 +260,7 @@ export default function AlertsPage() {
                     <Label htmlFor="task-category" className="text-xs">Categoria</Label>
                     <select
                       id="task-category"
-                      className="flex h-9 w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 font-medium"
+                      className="flex h-9 w-full rounded-lg bg-white border border-gray-300 px-2 py-1 text-xs text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                       value={newTaskCategory}
                       onChange={(e) => setNewTaskCategory(e.target.value)}
                     >
@@ -286,7 +286,7 @@ export default function AlertsPage() {
                     <Label htmlFor="task-rec" className="text-xs">Recorrência</Label>
                     <select
                       id="task-rec"
-                      className="flex h-8 w-full rounded-md border border-input bg-background px-2 py-1 text-xs"
+                      className="flex h-9 w-full rounded-lg bg-white border border-gray-300 px-2 py-1 text-xs text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                       value={newTaskRecurrence}
                       onChange={(e) => setNewTaskRecurrence(e.target.value)}
                     >

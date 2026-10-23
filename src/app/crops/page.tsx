@@ -416,7 +416,7 @@ export default function CropsPage() {
                 placeholder="Ex: Canteiro Alface Roxa, Pomar Laranjeiras..."
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-11 border-slate-300 text-sm"
+                className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
               />
             </div>
 
@@ -425,7 +425,7 @@ export default function CropsPage() {
                 <Label htmlFor="crop-type" className="text-xs font-bold text-slate-800">Tipo de Cultivo</Label>
                 <select
                   id="crop-type"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 >
@@ -444,7 +444,7 @@ export default function CropsPage() {
                 </Label>
                 <select
                   id="crop-category"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 >
@@ -463,7 +463,7 @@ export default function CropsPage() {
                   placeholder="Ex: 25 m², 12 árvores"
                   value={formData.area}
                   onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -471,7 +471,7 @@ export default function CropsPage() {
                 <Label htmlFor="crop-unit" className="text-xs font-bold text-slate-800">Unid. de Medida *</Label>
                 <select
                   id="crop-unit"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 >
@@ -485,7 +485,7 @@ export default function CropsPage() {
                 <Label htmlFor="crop-stage" className="text-xs font-bold text-slate-800">Estágio Fenológico</Label>
                 <select
                   id="crop-stage"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.stage}
                   onChange={(e) => setFormData({ ...formData, stage: e.target.value as any })}
                 >
@@ -520,7 +520,7 @@ export default function CropsPage() {
                   type="date"
                   value={formData.plantedDate}
                   onChange={(e) => setFormData({ ...formData, plantedDate: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
 
@@ -531,7 +531,7 @@ export default function CropsPage() {
                   placeholder="Ex: 2026-05-15 ou Colheita Semanal"
                   value={formData.expectedHarvest}
                   onChange={(e) => setFormData({ ...formData, expectedHarvest: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
             </div>
@@ -541,7 +541,7 @@ export default function CropsPage() {
                 <Label htmlFor="crop-health" className="text-xs font-bold text-slate-800">Vigor / Saúde</Label>
                 <select
                   id="crop-health"
-                  className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 font-medium"
+                  className="flex h-11 w-full rounded-xl bg-white border border-gray-300 px-3 py-2 text-sm text-gray-800 font-medium focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
                   value={formData.health}
                   onChange={(e) => setFormData({ ...formData, health: e.target.value as any })}
                 >
@@ -560,7 +560,7 @@ export default function CropsPage() {
                   placeholder="Ex: Irrigação gotejamento, adubação orgânica..."
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="h-11 border-slate-300 text-sm"
+                  className="h-11 bg-white border border-gray-300 text-gray-800 font-medium placeholder:text-gray-400 focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-sm"
                 />
               </div>
             </div>
