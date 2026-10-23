@@ -17,6 +17,7 @@ import { db, isFirebaseConfigured } from "@/lib/firebase"
 import { RocaDB } from "@/lib/db"
 import { useAuth } from "@/context/AuthContext"
 import { useToast } from "@/hooks/use-toast"
+import { assinarPlanoGoogle, GooglePlaySkuId } from "@/lib/google-play-billing"
 
 interface ProFeatureModalProps {
   isOpen: boolean
@@ -31,29 +32,50 @@ export function ProFeatureModal({
   featureName = "Plano Chácara Produtiva",
   limitDescription = "Você atingiu o limite do Plano Gratuito (até 2 culturas / 15 animais).",
 }: ProFeatureModalProps) {
-  const { user } = useAuth()
+  const { user, updateCurrentUserPlan } = useAuth()
   const { toast } = useToast()
 
-  const handleRequestPlan = (planName: string) => {
-    const saved = RocaDB.saveFeedback({
-      userId: user?.uid || "demo",
-      uid: user?.uid || "demo",
-      userName: user?.name || "Produtor(a)",
-      userEmail: user?.email || "visitante@rocactrl.com.br",
-      farmName: user?.farmName || "Meu Sítio",
-      type: "sugestao",
-      message: `Solicitação de upgrade para o plano: ${planName}`,
-      status: "pending",
+  const handleSubscribeGooglePlay = async (skuId: GooglePlaySkuId, planName: string) => {
+    const purchased = await assinarPlanoGoogle(skuId, async (newPlan, purchaseToken) => {
+      await updateCurrentUserPlan(newPlan)
+      if (isFirebaseConfigured && db && user?.uid) {
+        await setDoc(
+          doc(db, "users", user.uid),
+          {
+            plan: newPlan,
+            lastSkuId: skuId,
+            purchaseToken: purchaseToken || null,
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        ).catch(() => {})
+      }
     })
-    if (isFirebaseConfigured && db) {
-      setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
+
+    if (!purchased) {
+      // Registra também o interesse na coleção feedbacks para acompanhamento no /admin
+      const saved = RocaDB.saveFeedback({
+        userId: user?.uid || "demo",
+        uid: user?.uid || "demo",
+        userName: user?.name || "Produtor(a)",
+        userEmail: user?.email || "visitante@rocactrl.com.br",
+        farmName: user?.farmName || "Meu Sítio",
+        type: "sugestao",
+        message: `Interesse de assinatura no plano: ${planName} (${skuId})`,
+        status: "pending",
+      })
+      if (isFirebaseConfigured && db) {
+        setDoc(doc(db, "feedbacks", saved.id), saved, { merge: true }).catch(() => {})
+      }
+      toast({
+        title: "Assinatura via Google Play",
+        description: "Para assinar com 1 clique via Google Play, abra o aplicativo Android do RoçaCtrl.",
+      })
     }
-    toast({
-      title: "Solicitação enviada com sucesso! 🌱",
-      description: "Mensagem enviada com sucesso! Nossa equipe responderá em breve.",
-    })
+
     onClose()
   }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg rounded-2xl p-6">
@@ -78,7 +100,7 @@ export function ProFeatureModal({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase text-primary">Mais Popular</span>
-                <Badge className="bg-primary text-white text-[10px]">Economize no Anual</Badge>
+                <Badge className="bg-primary text-white text-[10px]">Google Play</Badge>
               </div>
               <h4 className="font-headline font-bold text-base text-slate-900">
                 Chácara Produtiva (Pro)
@@ -106,7 +128,9 @@ export function ProFeatureModal({
 
             <Button
               className="w-full h-10 text-xs bg-primary hover:bg-primary/90 text-white font-bold"
-              onClick={() => handleRequestPlan("Chácara Produtiva - Pro (R$ 9,90/mês)")}
+              onClick={() =>
+                handleSubscribeGooglePlay("rocactrl_pro_mensal", "Chácara Produtiva - Pro (R$ 9,90/mês)")
+              }
             >
               Assinar Pro (R$ 9,90)
             </Button>
@@ -147,7 +171,9 @@ export function ProFeatureModal({
             <Button
               variant="outline"
               className="w-full h-10 text-xs border-slate-300 text-slate-900 font-bold hover:bg-slate-100"
-              onClick={() => handleRequestPlan("Sítio Conectado - IoT (R$ 24,90/mês)")}
+              onClick={() =>
+                handleSubscribeGooglePlay("rocactrl_iot_mensal", "Sítio Conectado - IoT (R$ 24,90/mês)")
+              }
             >
               Assinar IoT (R$ 24,90)
             </Button>

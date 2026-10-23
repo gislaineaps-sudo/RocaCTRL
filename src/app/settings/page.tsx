@@ -33,17 +33,24 @@ import {
 import { ProFeatureModal } from "@/components/pro-feature-modal"
 import { BetaFeedbackModal } from "@/components/beta-feedback-modal"
 import { useToast } from "@/hooks/use-toast"
+import { assinarPlanoGoogle, GooglePlaySkuId } from "@/lib/google-play-billing"
 
 export default function SettingsPage() {
   const { modules, toggleModule } = usePreferences()
   const { isHighContrast, toggleHighContrast, increaseFontSize, decreaseFontSize, fontSize } = useAccessibility()
-  const { user } = useAuth()
+  const { user, updateCurrentUserPlan } = useAuth()
   const { toast } = useToast()
 
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [apiKey, setApiKey] = useState("")
+
+  const handleDirectGooglePlaySubscribe = async (skuId: GooglePlaySkuId) => {
+    await assinarPlanoGoogle(skuId, async (newPlan) => {
+      await updateCurrentUserPlan(newPlan)
+    })
+  }
 
   const handleCopySupportEmail = async () => {
     try {
@@ -215,7 +222,7 @@ export default function SettingsPage() {
                 </ul>
               </div>
               <Button
-                onClick={() => setIsProModalOpen(true)}
+                onClick={() => handleDirectGooglePlaySubscribe("rocactrl_pro_mensal")}
                 className="w-full h-9 text-xs bg-primary hover:bg-primary/90 text-white font-bold"
               >
                 {user?.plan === "pro" ? "Plano Ativo" : "Assinar Pro (R$ 9,90/mês)"}
@@ -251,13 +258,13 @@ export default function SettingsPage() {
                     <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" /> Acionamento remoto de bombas
                   </li>
                   <li className="flex items-center gap-1.5">
-                    <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" /> Alertas automáticos no WhatsApp
+                    <Check className="h-3.5 w-3.5 text-blue-600 shrink-0" /> Alertas automáticos de manejo
                   </li>
                 </ul>
               </div>
               <Button
                 variant="outline"
-                onClick={() => setIsProModalOpen(true)}
+                onClick={() => handleDirectGooglePlaySubscribe("rocactrl_iot_mensal")}
                 className="w-full h-9 text-xs border-slate-300 text-slate-900 font-bold hover:bg-slate-50"
               >
                 {user?.plan === "iot" ? "Plano Ativo" : "Assinar IoT (R$ 24,90/mês)"}
